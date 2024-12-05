@@ -55,5 +55,7 @@ if (names(sklep_rowerowy)[1]  == "ID") {
   sklep_rowerowy <- sklep_rowerowy[-1]
 }
 
-
+#zmiana zmiennej "Gender" na dane numeryczne
+sklep_rowerowy$Gender <- gsub("Female",0,sklep_rowerowy$Gender)
+sklep_rowerowy$Gender <- gsub("Male",1,sklep_rowerowy$Gender)
 
