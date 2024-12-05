@@ -49,3 +49,5 @@ gg_miss_upset(sklep_rowerowy, nsets=12)
 #dodajemy lokalizacje wartości NA wzdłuż osi ggplot
 
 geom_miss_point()
+
+
