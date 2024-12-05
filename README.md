@@ -41,7 +41,7 @@ miss_case_table(sklep_rowerowy)
 vis_miss(sklep_rowerowy)
 
 #Tworzy mapę cieplną liczby NA według grupy Purchased_Bike
-gg_miss_fct(sklep_rowerowy, fct = Purchased_Bike)
+gg_miss_fct(sklep_rowerowy, fct = Purchased.Bike)
 
 # Używamy UpSet plot do wizualizacji przecięć NA (tj. nakładania się NA lub współwystępowania) między zmiennymi.
 gg_miss_upset(sklep_rowerowy, nsets=12)
@@ -55,3 +55,6 @@ if (names(sklep_rowerowy)[1]  == "ID") {
   sklep_rowerowy <- sklep_rowerowy[-1]
 }
 sklep_rowerowy
+
+
+
