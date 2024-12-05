@@ -50,21 +50,10 @@ gg_miss_upset(sklep_rowerowy, nsets=12)
 
 geom_miss_point()
 
-<<<<<<< HEAD
+<<<<<<< HEAD #usuniecie pierwszego wiersza
 if (names(sklep_rowerowy)[1]  == "ID") {
   sklep_rowerowy <- sklep_rowerowy[-1]
 }
-=======
-#usuniecie pierwszego wiersza
-if (names(sklep_rowerowy)[1]  == "ID") {
-  sklep_rowerowy <- sklep_rowerowy[-1]
-}
-<<<<<<< HEAD
-sklep_rowerowy 
-1
-=======
-sklep_rowerowy
 
 
 
->>>>>>> 6ba0a425cd9fbd69db488cfe36b43ed5895dd02a
