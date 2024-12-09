@@ -50,7 +50,7 @@ gg_miss_upset(sklep_rowerowy, nsets=12)
 
 geom_miss_point()
 
-HEAD #usuniecie pierwszego wiersza
+#usuniecie pierwszego wiersza
 if (names(sklep_rowerowy)[1]  == "ID") {
   sklep_rowerowy <- sklep_rowerowy[-1]
 }
