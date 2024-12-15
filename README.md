@@ -55,4 +55,41 @@ if (names(sklep_rowerowy)[1]  == "ID") {
   sklep_rowerowy <- sklep_rowerowy[-1]
 }
 
+#instalacja i wczytanie pakietów
+install.packages("mice")
+install.packages("lattice")
+
+library(mice)
+library(lattice)
+
+
+# Wyświetlenie podglądu braków przed imputacją
+md.pattern(sklep_rowerowy)
+
+
+
+
+
+
+
+
+
+
+
+# Imputacja
+imputed_data <- mice(sklep_rowerowy, method = "pmm", m = 5, maxit = 50, seed = 123)
+
+# Podgląd wyników imputacji
+summary(imputed_data)
+
+
+# Uzyskanie kompletnego zestawu danych po imputacji
+completed_data <- complete(imputed_data, 1) # 1 oznacza pierwszy zestaw imputowanych danych
+
+# Wyświetlenie pierwszych kilku wierszy danych po imputacji
+print(head(completed_data))
+
+
+
+
 
