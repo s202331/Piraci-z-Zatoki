@@ -50,7 +50,7 @@ gg_miss_upset(sklep_rowerowy, nsets=12)
 
 geom_miss_point()
 
-#usuniecie pierwszego wiersza
+#usunięcie pierwszego wiersza
 if (names(sklep_rowerowy)[1]  == "ID") {
   sklep_rowerowy <- sklep_rowerowy[-1]
 }
@@ -65,15 +65,7 @@ library(lattice)
 
 # Wyświetlenie podglądu braków przed imputacją
 md.pattern(sklep_rowerowy)
-
-
-
-
-
-
-
-
-
+##### jakoś trzeba poprawić wygląd tego bo się tekst zlewa
 
 
 # Imputacja
