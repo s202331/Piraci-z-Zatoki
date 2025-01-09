@@ -1,5 +1,7 @@
 ---
 editor_options: 
+title: "Sklep rowerowy"
+author: "Jagoda Chęcińska, Piotr Łukowski, Tomasz Kotliński"
   markdown: 
     wrap: 72
 ---
@@ -19,7 +21,7 @@ library(mice)
 library(rpart)
 ### sprawdzamy ile mamy NA w pliku
 number_of_NA <- sum(is.na(sklep_rowerowy)) 
-print(number_of_NA)
+(number_of_NA)
 
 ###sprawdzamy które wiersze są brakujące 
 brakujace_wiersze <-sklep_rowerowy[complete.cases(sklep_rowerowy) == FALSE, ]
@@ -100,3 +102,7 @@ completed_data <- complete(imputed_data, 1)
 print(head(completed_data))
 ###sprawdzenie kompletnosci danych
 sum(is.na(completed_data))
+
+
+# Wizualizacje 
+
