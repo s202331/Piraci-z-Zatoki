@@ -100,5 +100,11 @@ print(head(completed_data))
 sum(is.na(completed_data))
 
 
-# Wizualizacje 
+# Wizualizacje
+sklep_rowerowy_wizualizacje <- data.frame(
+  Gender = factor(sklep_rowerowy$Gender, levels = c(0, 1), labels = c("Female", "Male")),
+  Married = factor(sklep_rowerowy$Marital.Status, levels = c(0, 1), labels = c("No", "Yes")),
+  Home.Owner = factor(sklep_rowerowy$Home.Owner, levels = c("No", "Yes")) 
+)
+str(sklep_rowerowy)
 
