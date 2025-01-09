@@ -1,2 +1,1 @@
 # Piraci-z-Zatoki
-SZANTA TO PIEKNA PIESN MORSKA
