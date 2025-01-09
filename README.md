@@ -38,8 +38,7 @@ liczba_kolumn <- ncol(sklep_rowerowy)
 braki_w_kolumnach <- colSums(is.na(sklep_rowerowy))
 (braki_w_kolumnach) 
 ### Instalujemy pakiet naniar
-install.packages("naniar") 
-library(naniar)
+
 
 ### sprawdzamy ile jest NA w pliku 
 n_miss(sklep_rowerowy)
@@ -75,10 +74,7 @@ if (names(sklep_rowerowy)[1] == "ID") {
   sklep_rowerowy <- sklep_rowerowy[-1, ]
 }
 
-### instalacja i wczytanie pakietów install.packages("mice")
-install.packages(c("mice", "lattice"))
-library(mice)
-library(lattice)
+
 # Imputacja Danych
 ### Wyświetlenie podglądu braków przed imputacją
 
