@@ -262,6 +262,6 @@ str(sklep_rowerowy)
 
 # macierz korelacji
 
-
+# podsumowanie 
 
 
