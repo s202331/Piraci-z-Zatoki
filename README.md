@@ -37,13 +37,12 @@ liczba_kolumn <- ncol(sklep_rowerowy)
 
 braki_w_kolumnach <- colSums(is.na(sklep_rowerowy))
 (braki_w_kolumnach) 
-### Instalujemy pakiet naniar
 
 
 ### sprawdzamy ile jest NA w pliku 
 n_miss(sklep_rowerowy)
 
-###Proporcja wartoci,które są NA prop_miss(sklep_rowerowy)
+### Proporcja wartoci,które są NA prop_miss(sklep_rowerowy)
 print(paste("Proporcja NA (prop_miss):", prop_miss(sklep_rowerowy)))
 
 ### Procent wartości, które są NA pct_miss(sklep_rowerowy)
@@ -54,7 +53,7 @@ miss_var_summary(sklep_rowerowy)
 
 ### Tabela podsumowująca NA według przypadku (obserwacji)
 miss_case_table(sklep_rowerowy)
-
+## Wizualizacje
 ### Wizualizacja lokalizacji NA jako obiektu ggplot
 vis_miss(sklep_rowerowy)
 
@@ -108,3 +107,4 @@ sklep_rowerowy_wizualizacje <- data.frame(
 )
 str(sklep_rowerowy)
 
+# Wartości odstające
