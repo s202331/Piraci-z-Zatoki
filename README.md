@@ -215,8 +215,21 @@ str(sklep_rowerowy)
 
 
 # Data Wrangling
+str(sklep_rowerowy)
+
+levels(sklep_rowerowy$`Marital Status`) <- c("Married", "Single")
+levels(sklep_rowerowy$`Gender`) <- c("Male", "Female")
+levels(sklep_rowerowy$`Home Owner`) <- c("No", "Yes")
+
 
 ### Zdiagnozowanie Braków
+number_of_NA <- sum(is.na(sklep_rowerowy)) 
+(number_of_NA)
+
+brakujace_wiersze <-sklep_rowerowy[complete.cases(sklep_rowerowy) == FALSE, ]
+(brakujace_wiersze)
+
+n_miss(sklep_rowerowy)
 
 ### Obliczanie liczby brakujących wartości (NA) w każdej kolumnie:
 
