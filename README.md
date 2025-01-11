@@ -108,3 +108,160 @@ sklep_rowerowy_wizualizacje <- data.frame(
 str(sklep_rowerowy)
 
 # Wartości odstające
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# Data Wrangling
+
+### Zdiagnozowanie Braków
+
+### Obliczanie liczby brakujących wartości (NA) w każdej kolumnie:
+
+### Obliczanie unikatowych wartości w każdej kolumnie:
+
+### Obliczanie proporcji odpowiedzi dla wybranych kategorii:
+
+### Sprawdzanie typu danych w każdej kolumnie
+
+### Zidentyfikowane problemy w bazie danych
+
+# 2. Czyszczenie Danych
+
+### 1. Usuwanie Kolumny “Loan_ID”
+
+### Ustandaryzowanie Danych
+
+# 3. Imputacja Danych
+
+### 4. Tworzenie Data Frame do wizualizacji
+
+# 3. Wartości Odstające
+### 1. Identyfikacja wartości odstających
+
+### 3.1. Definiowanie Funkcji outliers_iqr:
+
+### 3.2. Identyfikacja wartości odstających
+
+
+# II punkt - Wizualizacja danych
+# 1. Wykresy pudełkowe
+
+# 2 wykresy slupkowe
+
+# wykresy kolowe
+
+# histogramy
+
+# statystyki opisowe
+
+
+# korelacja
+
+# macierz korelacji
+
+
+
+
