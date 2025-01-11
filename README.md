@@ -131,13 +131,74 @@ str(sklep_rowerowy)
 
 
 
+glipse(sklep_rowerowy)
 
 
 
 
 
+# 5. Imputacja danych
+# Liczbowe: średnia z obcięciem 10%
+num_vars <- c("Income", "Age", "Children", "Cars")
+sklep_rowerowy <- sklep_rowerowy %>%
+  mutate(across(all_of(num_vars), ~ifelse(is.na(.), mean(., na.rm = TRUE, trim = 0.1), .)))
 
+# Kategoryczne: dominanta
+cat_vars <- c("Marital Status", "Gender", "Home Owner")
+sklep_rowerowy <- sklep_rowerowy %>%
+  mutate(across(all_of(cat_vars), ~ifelse(is.na(.), as.character(stats::mode(.)), .)))
 
+# 6. Konwersja zmiennych kategorycznych na factor
+factor_vars <- c("Marital Status", "Gender", "Education", "Occupation", "Home Owner", "Commute Distance", "Region", "Purchased Bike")
+sklep_rowerowy <- sklep_rowerowy %>% mutate(across(all_of(factor_vars), as.factor))
+
+# 7. Wizualizacja danych
+# Histogramy zmiennych liczbowych
+sklep_rowerowy %>% select(where(is.numeric)) %>%
+  pivot_longer(everything()) %>%
+  ggplot(aes(x = value)) +
+  geom_histogram(bins = 30, fill = "steelblue", color = "white") +
+  facet_wrap(~name, scales = "free") +
+  theme_minimal()
+
+# Wykresy słupkowe dla zmiennych kategorycznych
+sklep_rowerowy %>% select(where(is.factor)) %>%
+  pivot_longer(everything()) %>%
+  ggplot(aes(x = value)) +
+  geom_bar(fill = "skyblue") +
+  facet_wrap(~name, scales = "free") +
+  theme_minimal() +
+  coord_flip()
+
+# 8. Korelacja zmiennych liczbowych
+corr_matrix <- cor(sklep_rowerowy %>% select(where(is.numeric)), use = "complete.obs")
+corrplot(corr_matrix, method = "color", tl.cex = 0.8)
+
+# 9. Budowa modelu regresji logistycznej
+set.seed(123)
+train_index <- sample(seq_len(nrow(sklep_rowerowy)), size = 0.7 * nrow(sklep_rowerowy))
+train_data <- sklep_rowerowy[train_index, ]
+test_data <- sklep_rowerowy[-train_index, ]
+
+model_log <- glm(`Purchased Bike` ~ ., data = train_data, family = binomial)
+summary(model_log)
+
+pred_log <- predict(model_log, test_data, type = "response")
+pred_class_log <- ifelse(pred_log > 0.5, "Yes", "No")
+
+conf_matrix_log <- table(Predicted = pred_class_log, Actual = test_data$`Purchased Bike`)
+print(conf_matrix_log)
+
+# 10. Budowa modelu drzewa decyzyjnego
+tree_model <- rpart(`Purchased Bike` ~ ., data = train_data, method = "class")
+rpart.plot(tree_model)
+
+pred_tree <- predict(tree_model, test_data, type = "class")
+conf_matrix_tree <- table(Predicted = pred_tree, Actual = test_data$`Purchased Bike`)
+print(conf_matrix_tree)
+
+# 11. Podsumowanie danych
+print(dfSummary(sklep_rowerowy))
 
 
 
