@@ -1,5 +1,4 @@
 ---
-editor_options: 
 title: "Sklep rowerowy Analysis"
 author: "Jagoda Chęcińska, Piotr Łukowski, Tomasz Kotliński"
   markdown: 
