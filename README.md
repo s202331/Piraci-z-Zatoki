@@ -1,9 +1,10 @@
 ---
 title: "Sklep rowerowy Analysis"
 author: "Jagoda Chęcińska, Piotr Łukowski, Tomasz Kotliński"
-  markdown: 
-    wrap: 72
+markdown: 
+  wrap: 72
 ---
+
 
 # Piraci-z-Zatoki sklep rowerowy
 ### Wstep Klienci sklepu rowerowego wzięli udział w ankiecie, w której dostarczyli szczegółowe informacje na swój temat, takie jak status cywilny, płeć, poziom dochodów, liczba dzieci, poziom wykształcenia, wykonywany zawód, status posiadania domu, liczba samochodów, odległość do miejsca pracy, region zamieszkania oraz wiek. W badaniu uwzględniono również informację, czy klient zakupił rower. Celem analizy jest określenie, które z tych czynników mają największy wpływ na decyzję o zakupie roweru.
