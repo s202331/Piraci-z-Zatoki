@@ -231,6 +231,17 @@ brakujace_wiersze <-sklep_rowerowy[complete.cases(sklep_rowerowy) == FALSE, ]
 
 n_miss(sklep_rowerowy)
 
+miss_var_summary(sklep_rowerowy)
+
+vis_miss(sklep_rowerowy) + geom_miss_point()
+
+braki <- miss_var_summary(sklep_rowerowy)
+print(braki)
+
+ggplot(braki, aes(x = variable, y = n_miss)) +
+  geom_bar(stat = "identity") +
+  labs(title = "Liczba braków danych w każdej kolumnie", x = "Kolumna", y = "Liczba braków") +
+  theme_minimal()
 ### Obliczanie liczby brakujących wartości (NA) w każdej kolumnie:
 
 ### Obliczanie unikatowych wartości w każdej kolumnie:
