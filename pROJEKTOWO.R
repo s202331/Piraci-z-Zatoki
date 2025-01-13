@@ -5,7 +5,7 @@ date: "`r Sys.Date()`"
 output: html_document
 ---
 
-
+---
 # Piraci-z-Zatoki sklep rowerowy
 ### Wstep Klienci sklepu rowerowego wzięli udział w ankiecie, w której dostarczyli szczegółowe informacje na swój temat, takie jak status cywilny, płeć, poziom dochodów, liczba dzieci, poziom wykształcenia, wykonywany zawód, status posiadania domu, liczba samochodów, odległość do miejsca pracy, region zamieszkania oraz wiek. W badaniu uwzględniono również informację, czy klient zakupił rower. Celem analizy jest określenie, które z tych czynników mają największy wpływ na decyzję o zakupie roweru.
 ## Data Wrangling
@@ -21,7 +21,9 @@ library(mice)
 library(rpart)
 library(ggcorrplot)
 library(rpart.plot)
-
+---
+  
+---
 # Podstawowa Analiza braków
 n_miss(sklep_rowerowy) # Sprawdzamy ilość NA w pliku
 
@@ -60,7 +62,9 @@ sklep_rowerowy <- sklep_rowerowy %>%
     `Purchased.Bike` = factor(`Purchased.Bike`)
   )
 str(sklep_rowerowy)
-
+---
+  
+---
 ### Zmienne liczbowe - średnia adaptacyjna
 sklep_rowerowy <- sklep_rowerowy %>%
   mutate(across(where(is.numeric), ~ ifelse(is.na(.), mean(., na.rm = TRUE, trim = 0.1), .)))
@@ -74,6 +78,10 @@ sklep_rowerowy
 
 n_miss(sklep_rowerowy)
 
+---
+  
+  
+---
 ## Wizualizacja braków danych po imputacji
 vis_miss(sklep_rowerowy) +
   labs(title = "Braki danych po imputacji")
@@ -101,8 +109,9 @@ sklep_rowerowy %>%
   theme_minimal()  #wizualizacja zmiennych kategorycznych
 
 
-## Wizualizacja danych kategorycznych
+---
 
+---
 #Poniższe wykresy przedstawiają rozkłady danych dla wybranych zmiennych kategorycznych.
 
 # `Marital Status`
@@ -118,17 +127,19 @@ ggplot(dane, aes(x = `Home Owner`)) +
   geom_bar() +
   labs(title = "Rozkład własności domu", x = "Czy posiada dom", y = "Liczba osób")
 
+# nie działa
+---
 
 
-
-
-
+---
 ## Korelacja zmiennych liczbowych
 cor_matrix <- cor(sklep_rowerowy %>% select(where(is.numeric)), use = "complete.obs")
 ggcorrplot(cor_matrix, hc.order = TRUE, type = "lower", lab = TRUE)
 
 
-
+---
+  
+---
 ## Model drzewa decyzyjnego
 set.seed(123)
 train_index <- sample(seq_len(nrow(sklep_rowerowy)), size = 0.7 * nrow(sklep_rowerowy))
@@ -152,7 +163,8 @@ print(conf_matrix)
 # Obliczenie dokładności modelu
 accuracy <- mean(tree_predictions == test_data$`Purchased.Bike`)
 cat("📊 Dokładność modelu drzewa decyzyjnego:", round(accuracy * 100, 2), "%\n")
-
+---
+---  
 ## Segmentacja klientów (Klasteryzacja K-średnich)
 
 cluster_data <- sklep_rowerowy %>% select(where(is.numeric))
@@ -166,3 +178,4 @@ kmeans_model <- kmeans(cluster_data_scaled, centers = 3, nstart = 25)
 fviz_cluster(kmeans_model, data = cluster_data_scaled, geom = "point") +
   labs(title = "Segmentacja klientów - Klasteryzacja K-średnich")
 
+---
