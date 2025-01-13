@@ -11,7 +11,7 @@ output: html_document
 ## Data Wrangling
 ### zaladowanie potrzebnych pakietów 
 # Instalacja i załadowanie wszystkich wymaganych pakietów
-install.packages(c("readr", "naniar", "dplyr", "tidyr", "ggplot2", "mice", "rpart","ggcorrplot","rpart.plot" , "factoextra", "plyr"))
+install.packages(c("readr", "naniar", "dplyr", "tidyr","car", "ggplot2", "mice", "rpart","ggcorrplot","rpart.plot" ,"gridExtra", "factoextra", "plyr"))
 library(readr)
 library(naniar)
 library(plyr)
@@ -23,8 +23,10 @@ library(rpart)
 library(ggcorrplot)
 library(rpart.plot)
 library(factoextra)
+library(gridExtra)
+library(car)
 ---
-  
+
 ---
 # Podstawowa Analiza braków
 n_miss(sklep_rowerowy) # Sprawdzamy ilość NA w pliku
@@ -69,7 +71,7 @@ str(sklep_rowerowy)
 ---
 ### Zmienne liczbowe - średnia adaptacyjna
 sklep_rowerowy <- sklep_rowerowy %>%
-  mutate(across(where(is.numeric), ~ ifelse(is.na(.), mean(., na.rm = TRUE, trim = 0.1), .)))
+mutate(across(where(is.numeric), ~ ifelse(is.na(.), mean(., na.rm = TRUE, trim = 0.1), .)))
 
 ### Zmienne kategoryczne - imputacja metodą `pmm`
 
@@ -85,9 +87,7 @@ n_miss(sklep_rowerowy)
   
 ---
 ## Wizualizacja braków danych po imputacji
-vis_miss(sklep_rowerowy) +
-  labs(title = "Braki danych po imputacji")
-
+vis_miss(sklep_rowerowy) + labs(title = "Braki danych po imputacji")
 
 sklep_rowerowy %>%
 select(where(is.numeric)) %>%
@@ -109,23 +109,41 @@ geom_bar(fill = "steelblue") +
 facet_wrap(~ name, scales = "free") +
 labs(title = "Rozkład zmiennych kategorycznych", x = "Kategorie", y = "Liczba obserwacji") +
 theme_minimal()  #wizualizacja zmiennych kategorycznych
+# Wizualizacje
+# Wykres zakupu rowerów względem regionu
+plot_region <- ggplot(sklep_rowerowy, aes(x = Region, fill = as.factor(`Purchased.Bike`))) +
+  geom_bar(position = "dodge") +
+  labs(title = "Zakup rowerów względem regionu",
+       x = "Region",
+       y = "Liczba zakupów",
+       fill = "Zakup roweru (No = 0, Yes = 1)") +
+  theme_minimal()
 
+# Wykres zakupu rowerów względem przejechanych kilometrów
+plot_distance <- ggplot(sklep_rowerowy, aes(x = `Commute.Distance`, fill = as.factor(`Purchased.Bike`))) +
+geom_bar(position = "dodge") +
+labs(title = "Zakup rowerów względem przejechanych kilometrów",
+      x = "Dystans dojazdu do pracy",
+      y = "Liczba zakupów",
+      fill = "Zakup roweru (No = 0, Yes = 1)") +
+theme_minimal()
 
----
-## Analiza dochodów względem zakupu roweru
-
-# Obliczenie średnich dochodów dla grup
-mu_income <- ddply(sklep_rowerowy, "Purchased.Bike", summarise, grp.mean = mean(Income, na.rm = TRUE))
-
-# Histogram dochodów i zakupionych rowerów z zaznaczeniem średnich dochodów
-ggplot(sklep_rowerowy, aes(x = Income, fill = as.factor(`Purchased.Bike`), color = as.factor(`Purchased.Bike`))) +
+# Wykres zakupu rowerów względem dochodu
+plot_income <- ggplot(sklep_rowerowy, aes(x = Income, fill = as.factor(`Purchased.Bike`))) +
   geom_histogram(position = "dodge", bins = 30, alpha = 0.7) +
-  geom_vline(data = mu_income[mu_income$`Purchased.Bike` == "Yes", ], aes(xintercept = grp.mean), linetype = "dashed", color = "#377eb8") +
-  geom_vline(data = mu_income[mu_income$`Purchased.Bike` == "No", ], aes(xintercept = grp.mean), linetype = "dashed", color = "#e41a1c") +
-  labs(title = "Dochody klientów względem zakupu roweru",
+  labs(title = "Dochód klientów względem zakupu roweru",
        x = "Dochód",
        y = "Liczba klientów",
        fill = "Zakup roweru (No = 0, Yes = 1)") +
+  theme_minimal()
+
+
+# Wykres pudełkowy pokazujący rozkład dochodów w różnych regionach
+ggplot(sklep_rowerowy, aes(x = Region, y = Income, fill = Region)) +
+  geom_boxplot() +
+  labs(title = "Dochód klientów w różnych regionach",
+       x = "Region",
+       y = "Dochód") +
   theme_minimal()
 
 ---
@@ -194,3 +212,25 @@ kmeans_model <- kmeans(cluster_data_scaled, centers = 4, nstart = 25)
 
 fviz_cluster(kmeans_model, data = cluster_data_scaled, geom = "point") +
   labs(title = "Segmentacja klientów - Klasteryzacja K-średnich")
+
+
+# Test Kruskala-Wallisa dla dochodu a zakupu roweru
+kruskal_test_income_education <- kruskal.test(Income ~ Education, data = sklep_rowerowy)
+print(kruskal_test_income_education)
+
+# Test jednorodności wariancji (Levene’a)
+leveneTest(Income ~ Region, data = sklep_rowerowy)
+
+
+
+# Test Shapiro-Wilka dla każdej grupy poziomu wykształcenia
+by(sklep_rowerowy$Income, sklep_rowerowy$Education, shapiro.test)
+
+# Test jednorodności wariancji (Levene’a) dla poziomu wykształcenia
+leveneTest(Income ~ Education, data = sklep_rowerowy)
+
+
+# Test ANOVA dla dochodów w zależności od poziomu wykształcenia
+anova_income_education <- aov(Income ~ Education, data = sklep_rowerowy)
+summary(anova_income_education)
+
