@@ -1,6 +1,6 @@
 ---
-  title: "Zaawansowana Analiza Danych - Sklep Rowerowy"
-author: "Zespół Analityczny"
+  title: "Sklep rowerowy Analysis"
+author: "Jagoda Chęcińska, Piotr Łukowski, Tomasz Kotliński"
 date: "`r Sys.Date()`"
 output: html_document
 ---
@@ -11,7 +11,7 @@ output: html_document
 ## Data Wrangling
 ### zaladowanie potrzebnych pakietów 
 # Instalacja i załadowanie wszystkich wymaganych pakietów
-install.packages(c("readr", "naniar", "dplyr", "tidyr", "ggplot2", "mice", "rpart","ggcorrplot","rpart.plot"))
+install.packages(c("readr", "naniar", "dplyr", "tidyr", "ggplot2", "mice", "rpart","ggcorrplot","rpart.plot" , "factoextra"))
 library(readr)
 library(naniar)
 library(dplyr)
@@ -21,6 +21,7 @@ library(mice)
 library(rpart)
 library(ggcorrplot)
 library(rpart.plot)
+library(factoextra)
 ---
   
 ---
@@ -87,26 +88,26 @@ vis_miss(sklep_rowerowy) +
   labs(title = "Braki danych po imputacji")
 
 
-  sklep_rowerowy %>%
-  select(where(is.numeric)) %>%
-  pivot_longer(everything()) %>%
-  ggplot(aes(x = value)) +
-  geom_histogram(bins = 30, fill = "skyblue", color = "black") +
-  facet_wrap(~ name, scales = "free") +
-  labs(title = "Rozkład zmiennych liczbowych", x = "Wartość", y = "Częstość") +
-  theme_minimal()   # wizualizacja zmiennych liczbowych
+sklep_rowerowy %>%
+select(where(is.numeric)) %>%
+pivot_longer(everything()) %>%
+ggplot(aes(x = value)) +
+geom_histogram(bins = 30, fill = "skyblue", color = "black") +
+facet_wrap(~ name, scales = "free") +
+labs(title = "Rozkład zmiennych liczbowych", x = "Wartość", y = "Częstość") +
+theme_minimal()   # wizualizacja zmiennych liczbowych
 
 
 
 
 sklep_rowerowy %>%
-  select(where(is.factor)) %>%
-  pivot_longer(everything()) %>%
-  ggplot(aes(x = value)) +
-  geom_bar(fill = "steelblue") +
-  facet_wrap(~ name, scales = "free") +
-  labs(title = "Rozkład zmiennych kategorycznych", x = "Kategorie", y = "Liczba obserwacji") +
-  theme_minimal()  #wizualizacja zmiennych kategorycznych
+select(where(is.factor)) %>%
+pivot_longer(everything()) %>%
+ggplot(aes(x = value)) +
+geom_bar(fill = "steelblue") +
+facet_wrap(~ name, scales = "free") +
+labs(title = "Rozkład zmiennych kategorycznych", x = "Kategorie", y = "Liczba obserwacji") +
+theme_minimal()  #wizualizacja zmiennych kategorycznych
 
 
 ---
@@ -114,20 +115,20 @@ sklep_rowerowy %>%
 ---
 #Poniższe wykresy przedstawiają rozkłady danych dla wybranych zmiennych kategorycznych.
 
-# `Marital Status`
-ggplot(dane, aes(x = `Marital Status`)) +
+# Marital Status
+ggplot(sklep_rowerowy, aes(x = `Marital.Status`)) +
   geom_bar() +
   labs(title = "Rozkład stanu cywilnego", x = "Stan cywilny", y = "Liczba osób")
-# `Gender`
-ggplot(dane, aes(x = `Gender`)) +
+# Gender 
+ggplot(sklep_rowerowy, aes(x = `Gender`)) +
   geom_bar() +
   labs(title = "Rozkład płci", x = "Płeć", y = "Liczba osób")
-# `Home Owner`
-ggplot(dane, aes(x = `Home Owner`)) +
+#  Home Owner
+ggplot(sklep_rowerowy, aes(x = `Home.Owner`)) +
   geom_bar() +
   labs(title = "Rozkład własności domu", x = "Czy posiada dom", y = "Liczba osób")
 
-# nie działa
+
 ---
 
 
@@ -158,7 +159,7 @@ tree_predictions <- predict(tree_model, test_data, type = "class")
 
 # Macierz pomyłek
 conf_matrix <- table(Predicted = tree_predictions, Actual = test_data$`Purchased.Bike`)
-print(conf_matrix)
+(conf_matrix)
 
 # Obliczenie dokładności modelu
 accuracy <- mean(tree_predictions == test_data$`Purchased.Bike`)
@@ -166,16 +167,13 @@ cat("📊 Dokładność modelu drzewa decyzyjnego:", round(accuracy * 100, 2), "
 ---
 ---  
 ## Segmentacja klientów (Klasteryzacja K-średnich)
-
 cluster_data <- sklep_rowerowy %>% select(where(is.numeric))
 cluster_data_scaled <- scale(cluster_data)
 
 fviz_nbclust(cluster_data_scaled, kmeans, method = "wss")
 
 set.seed(123)
-kmeans_model <- kmeans(cluster_data_scaled, centers = 3, nstart = 25)
+kmeans_model <- kmeans(cluster_data_scaled, centers = 4, nstart = 25)
 
 fviz_cluster(kmeans_model, data = cluster_data_scaled, geom = "point") +
   labs(title = "Segmentacja klientów - Klasteryzacja K-średnich")
-
----
