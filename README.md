@@ -51,7 +51,9 @@ miss_case_table(sklep_rowerowy)
 ## Wizualizacje
 ### Wizualizacja lokalizacji NA jako obiektu ggplot
 vis_miss(sklep_rowerowy)
+### dodajemy lokalizacje wartości NA wzdłuż osi ggplot
 
+vis_miss(sklep_rowerowy) + geom_miss_point()
 ###Tworzy mapę cieplną liczby NA według grupy Purchased_Bike
 gg_miss_fct(sklep_rowerowy, fct = Purchased.Bike)
 
@@ -59,9 +61,6 @@ gg_miss_fct(sklep_rowerowy, fct = Purchased.Bike)
 
 gg_miss_upset(sklep_rowerowy, nsets=12)
 
-### dodajemy lokalizacje wartości NA wzdłuż osi ggplot
-
-vis_miss(sklep_rowerowy) + geom_miss_point()
 
 ### usunięcie pierwszego wiersza if (names(sklep_rowerowy)[1] == "ID") {
 if (names(sklep_rowerowy)[1] == "ID") {
@@ -93,7 +92,7 @@ print(head(completed_data))
 ###sprawdzenie kompletnosci danych
 sum(is.na(completed_data))
 
-
+plot(imputed_data)
 # Wizualizacje
 sklep_rowerowy_wizualizacje <- data.frame(
   Gender = factor(sklep_rowerowy$Gender, levels = c(0, 1), labels = c("Female", "Male")),
@@ -168,21 +167,6 @@ sklep_rowerowy %>% select(where(is.factor)) %>%
 # 8. Korelacja zmiennych liczbowych
 corr_matrix <- cor(sklep_rowerowy %>% select(where(is.numeric)), use = "complete.obs")
 corrplot(corr_matrix, method = "color", tl.cex = 0.8)
-
-# 9. Budowa modelu regresji logistycznej
-set.seed(123)
-train_index <- sample(seq_len(nrow(sklep_rowerowy)), size = 0.7 * nrow(sklep_rowerowy))
-train_data <- sklep_rowerowy[train_index, ]
-test_data <- sklep_rowerowy[-train_index, ]
-
-model_log <- glm(`Purchased Bike` ~ ., data = train_data, family = binomial)
-summary(model_log)
-
-pred_log <- predict(model_log, test_data, type = "response")
-pred_class_log <- ifelse(pred_log > 0.5, "Yes", "No")
-
-conf_matrix_log <- table(Predicted = pred_class_log, Actual = test_data$`Purchased Bike`)
-print(conf_matrix_log)
 
 # 10. Budowa modelu drzewa decyzyjnego
 tree_model <- rpart(`Purchased Bike` ~ ., data = train_data, method = "class")
