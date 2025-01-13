@@ -1,5 +1,5 @@
 ---
-  title: "Zaawansowana Analiza Danych - Sklep Rowerowy"
+  title: "Sklep rowerowy Analysis"
 author: "Jagoda Chęcińska, Piotr Łukowski, Tomasz Kotliński"
 date: "`r Sys.Date()`"
 output: html_document
