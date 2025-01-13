@@ -1,9 +1,17 @@
+---
+  title: "Zaawansowana Analiza Danych - Sklep Rowerowy"
+author: "Zespół Analityczny"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+
 # Piraci-z-Zatoki sklep rowerowy
 ### Wstep Klienci sklepu rowerowego wzięli udział w ankiecie, w której dostarczyli szczegółowe informacje na swój temat, takie jak status cywilny, płeć, poziom dochodów, liczba dzieci, poziom wykształcenia, wykonywany zawód, status posiadania domu, liczba samochodów, odległość do miejsca pracy, region zamieszkania oraz wiek. W badaniu uwzględniono również informację, czy klient zakupił rower. Celem analizy jest określenie, które z tych czynników mają największy wpływ na decyzję o zakupie roweru.
 ## Data Wrangling
 ### zaladowanie potrzebnych pakietów 
 # Instalacja i załadowanie wszystkich wymaganych pakietów
-install.packages(c("readr", "naniar", "dplyr", "tidyr", "ggplot2", "mice", "rpart","ggcorrplot"))
+install.packages(c("readr", "naniar", "dplyr", "tidyr", "ggplot2", "mice", "rpart","ggcorrplot","rpart.plot"))
 library(readr)
 library(naniar)
 library(dplyr)
@@ -12,6 +20,7 @@ library(ggplot2)
 library(mice)
 library(rpart)
 library(ggcorrplot)
+library(rpart.plot)
 
 # Podstawowa Analiza braków
 n_miss(sklep_rowerowy) # Sprawdzamy ilość NA w pliku
@@ -70,7 +79,6 @@ vis_miss(sklep_rowerowy) +
   labs(title = "Braki danych po imputacji")
 
 
---------------------------------------------------------------------------------
   sklep_rowerowy %>%
   select(where(is.numeric)) %>%
   pivot_longer(everything()) %>%
@@ -93,7 +101,68 @@ sklep_rowerowy %>%
   theme_minimal()  #wizualizacja zmiennych kategorycznych
 
 
+## Wizualizacja danych kategorycznych
+
+#Poniższe wykresy przedstawiają rozkłady danych dla wybranych zmiennych kategorycznych.
+
+# `Marital Status`
+ggplot(dane, aes(x = `Marital Status`)) +
+  geom_bar() +
+  labs(title = "Rozkład stanu cywilnego", x = "Stan cywilny", y = "Liczba osób")
+# `Gender`
+ggplot(dane, aes(x = `Gender`)) +
+  geom_bar() +
+  labs(title = "Rozkład płci", x = "Płeć", y = "Liczba osób")
+# `Home Owner`
+ggplot(dane, aes(x = `Home Owner`)) +
+  geom_bar() +
+  labs(title = "Rozkład własności domu", x = "Czy posiada dom", y = "Liczba osób")
+
+
+
+
+
+
 ## Korelacja zmiennych liczbowych
 cor_matrix <- cor(sklep_rowerowy %>% select(where(is.numeric)), use = "complete.obs")
 ggcorrplot(cor_matrix, hc.order = TRUE, type = "lower", lab = TRUE)
+
+
+
+## Model drzewa decyzyjnego
+set.seed(123)
+train_index <- sample(seq_len(nrow(sklep_rowerowy)), size = 0.7 * nrow(sklep_rowerowy))
+train_data <- sklep_rowerowy[train_index, ]
+test_data <- sklep_rowerowy[-train_index, ]
+
+# Budowa drzewa decyzyjnego
+tree_model <- rpart(`Purchased.Bike` ~ ., data = train_data, method = "class")
+tree_model
+# Wizualizacja drzewa decyzyjnego z ulepszeniami
+rpart.plot(tree_model, type = 4, extra = 104, fallen.leaves = TRUE, 
+           box.palette = "RdBu", shadow.col = "gray", nn = TRUE)
+
+# Przewidywanie na zbiorze testowym
+tree_predictions <- predict(tree_model, test_data, type = "class")
+
+# Macierz pomyłek
+conf_matrix <- table(Predicted = tree_predictions, Actual = test_data$`Purchased.Bike`)
+print(conf_matrix)
+
+# Obliczenie dokładności modelu
+accuracy <- mean(tree_predictions == test_data$`Purchased.Bike`)
+cat("📊 Dokładność modelu drzewa decyzyjnego:", round(accuracy * 100, 2), "%\n")
+
+## Segmentacja klientów (Klasteryzacja K-średnich)
+
+cluster_data <- sklep_rowerowy %>% select(where(is.numeric))
+cluster_data_scaled <- scale(cluster_data)
+
+fviz_nbclust(cluster_data_scaled, kmeans, method = "wss")
+
+set.seed(123)
+kmeans_model <- kmeans(cluster_data_scaled, centers = 3, nstart = 25)
+
+fviz_cluster(kmeans_model, data = cluster_data_scaled, geom = "point") +
+  labs(title = "Segmentacja klientów - Klasteryzacja K-średnich")
 
