@@ -11,9 +11,10 @@ output: html_document
 ## Data Wrangling
 ### zaladowanie potrzebnych pakietów 
 # Instalacja i załadowanie wszystkich wymaganych pakietów
-install.packages(c("readr", "naniar", "dplyr", "tidyr", "ggplot2", "mice", "rpart","ggcorrplot","rpart.plot" , "factoextra"))
+install.packages(c("readr", "naniar", "dplyr", "tidyr", "ggplot2", "mice", "rpart","ggcorrplot","rpart.plot" , "factoextra", "plyr"))
 library(readr)
 library(naniar)
+library(plyr)
 library(dplyr)
 library(tidyr)
 library(ggplot2)
@@ -111,6 +112,21 @@ theme_minimal()  #wizualizacja zmiennych kategorycznych
 
 
 ---
+## Analiza dochodów względem zakupu roweru
+
+# Obliczenie średnich dochodów dla grup
+mu_income <- ddply(sklep_rowerowy, "Purchased.Bike", summarise, grp.mean = mean(Income, na.rm = TRUE))
+
+# Histogram dochodów i zakupionych rowerów z zaznaczeniem średnich dochodów
+ggplot(sklep_rowerowy, aes(x = Income, fill = as.factor(`Purchased.Bike`), color = as.factor(`Purchased.Bike`))) +
+  geom_histogram(position = "dodge", bins = 30, alpha = 0.7) +
+  geom_vline(data = mu_income[mu_income$`Purchased.Bike` == "Yes", ], aes(xintercept = grp.mean), linetype = "dashed", color = "#377eb8") +
+  geom_vline(data = mu_income[mu_income$`Purchased.Bike` == "No", ], aes(xintercept = grp.mean), linetype = "dashed", color = "#e41a1c") +
+  labs(title = "Dochody klientów względem zakupu roweru",
+       x = "Dochód",
+       y = "Liczba klientów",
+       fill = "Zakup roweru (No = 0, Yes = 1)") +
+  theme_minimal()
 
 ---
 #Poniższe wykresy przedstawiają rozkłady danych dla wybranych zmiennych kategorycznych.
@@ -139,7 +155,8 @@ ggcorrplot(cor_matrix, hc.order = TRUE, type = "lower", lab = TRUE)
 
 
 ---
-  
+
+
 ---
 ## Model drzewa decyzyjnego
 set.seed(123)
