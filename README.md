@@ -328,4 +328,3 @@ ggplot(braki, aes(x = variable, y = n_miss)) +
 
 # podsumowanie 
 
-
