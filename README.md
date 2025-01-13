@@ -42,11 +42,6 @@ braki_w_kolumnach <- colSums(is.na(sklep_rowerowy))
 ### sprawdzamy ile jest NA w pliku 
 n_miss(sklep_rowerowy)
 
-### Proporcja wartoci,które są NA prop_miss(sklep_rowerowy)
-print(paste("Proporcja NA (prop_miss):", prop_miss(sklep_rowerowy)))
-
-### Procent wartości, które są NA pct_miss(sklep_rowerowy)
-print(paste("Procent NA (pct_miss):", pct_miss(sklep_rowerowy)))
 
 ### Tabela podsumowująca liczby NA w tabeli.
 miss_var_summary(sklep_rowerowy)
