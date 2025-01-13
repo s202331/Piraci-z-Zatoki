@@ -1,8 +1,8 @@
 ---
-title: "Sklep rowerowy Analysis"
+  title: "Zaawansowana Analiza Danych - Sklep Rowerowy"
 author: "Jagoda Chęcińska, Piotr Łukowski, Tomasz Kotliński"
-markdown: 
-  wrap: 72
+date: "`r Sys.Date()`"
+output: html_document
 ---
 
 
