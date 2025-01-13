@@ -1,17 +1,17 @@
 ---
-  title: "Sklep rowerowy Analysis"
-author: "Jagoda Chęcińska, Piotr Łukowski, Tomasz Kotliński"
+  title: "Zaawansowana Analiza Danych - Sklep Rowerowy"
+author: "Zespół Analityczny"
 date: "`r Sys.Date()`"
 output: html_document
 ---
 
-
+---
 # Piraci-z-Zatoki sklep rowerowy
 ### Wstep Klienci sklepu rowerowego wzięli udział w ankiecie, w której dostarczyli szczegółowe informacje na swój temat, takie jak status cywilny, płeć, poziom dochodów, liczba dzieci, poziom wykształcenia, wykonywany zawód, status posiadania domu, liczba samochodów, odległość do miejsca pracy, region zamieszkania oraz wiek. W badaniu uwzględniono również informację, czy klient zakupił rower. Celem analizy jest określenie, które z tych czynników mają największy wpływ na decyzję o zakupie roweru.
 ## Data Wrangling
 ### zaladowanie potrzebnych pakietów 
 # Instalacja i załadowanie wszystkich wymaganych pakietów
-install.packages(c("readr", "naniar", "dplyr", "tidyr", "ggplot2", "mice", "rpart"))
+install.packages(c("readr", "naniar", "dplyr", "tidyr", "ggplot2", "mice", "rpart","ggcorrplot","rpart.plot"))
 library(readr)
 library(naniar)
 library(dplyr)
@@ -19,312 +19,163 @@ library(tidyr)
 library(ggplot2)
 library(mice)
 library(rpart)
-### sprawdzamy ile mamy NA w pliku
-number_of_NA <- sum(is.na(sklep_rowerowy)) 
-(number_of_NA)
+library(ggcorrplot)
+library(rpart.plot)
+---
+  
+---
+# Podstawowa Analiza braków
+n_miss(sklep_rowerowy) # Sprawdzamy ilość NA w pliku
 
-###sprawdzamy które wiersze są brakujące 
-brakujace_wiersze <-sklep_rowerowy[complete.cases(sklep_rowerowy) == FALSE, ]
-(brakujace_wiersze)
+vis_miss(sklep_rowerowy) # wizualizacja NA
 
-### Obliczenie liczby kolumn
+miss_var_summary(sklep_rowerowy) # Podsumowanie braków w kolumnach
 
-liczba_kolumn <- ncol(sklep_rowerowy) 
-### Wyświetlenie liczby kolumn
-(liczba_kolumn)
+braki_procent <- sklep_rowerowy %>%
+  summarise(across(everything(), ~ mean(is.na(.)) * 100)) %>%
+  pivot_longer(everything(), names_to = "Kolumna", values_to = "Procent")
 
-### Sprawdzamy liczbę braków w każdej kolumnie
+ggplot(braki_procent, aes(x = reorder(Kolumna, -Procent), y = Procent)) +
+  geom_bar(stat = "identity", fill = "steelblue") +
+  coord_flip() +
+  labs(title = "Procent brakujących danych w kolumnach",
+       x = "Kolumna", y = "% braków") +
+  theme_minimal()      # wizualizacja procentowa braków w każdej kolumnie
 
-braki_w_kolumnach <- colSums(is.na(sklep_rowerowy))
-(braki_w_kolumnach) 
-
-
-### sprawdzamy ile jest NA w pliku 
-n_miss(sklep_rowerowy)
-
-
-### Tabela podsumowująca liczby NA w tabeli.
-miss_var_summary(sklep_rowerowy)
-
-### Tabela podsumowująca NA według przypadku (obserwacji)
-miss_case_table(sklep_rowerowy)
-## Wizualizacje
-### Wizualizacja lokalizacji NA jako obiektu ggplot
-vis_miss(sklep_rowerowy)
-### dodajemy lokalizacje wartości NA wzdłuż osi ggplot
-
-vis_miss(sklep_rowerowy) + geom_miss_point()
-###Tworzy mapę cieplną liczby NA według grupy Purchased_Bike
-gg_miss_fct(sklep_rowerowy, fct = Purchased.Bike)
-
-### Używamy UpSet plot do wizualizacji przecięć NA (tj.nakładania się NA lub współwystępowania) między zmiennymi.
-
-gg_miss_upset(sklep_rowerowy, nsets=12)
+vis_miss(sklep_rowerowy, cluster = TRUE) # Klasteryzacja braków dla porównania różnych kolumn
 
 
-### usunięcie pierwszego wiersza if (names(sklep_rowerowy)[1] == "ID") {
-if (names(sklep_rowerowy)[1] == "ID") {
-  sklep_rowerowy <- sklep_rowerowy[-1, ]
-}
-
-
-# Imputacja Danych
-### Wyświetlenie podglądu braków przed imputacją
-
-md.pattern(sklep_rowerowy) 
-
-
-imputed_data <- mice(sklep_rowerowy, method = "pmm", m = 5, maxit = 50,
-seed = 123)
-
-### Podgląd wyników imputacji
-
-summary(imputed_data)
-
-### Uzyskanie kompletnego zestawu danych po imputacji
-
-completed_data <- complete(imputed_data, 1) 
-### 1 oznacza pierwszyzestaw imputowanych danych
-
-### Wyświetlenie pierwszych kilku wierszy danych po imputacji
-
-print(head(completed_data))
-###sprawdzenie kompletnosci danych
-sum(is.na(completed_data))
-
-plot(imputed_data)
-# Wizualizacje
-sklep_rowerowy_wizualizacje <- data.frame(
-  Gender = factor(sklep_rowerowy$Gender, levels = c(0, 1), labels = c("Female", "Male")),
-  Married = factor(sklep_rowerowy$Marital.Status, levels = c(0, 1), labels = c("No", "Yes")),
-  Home.Owner = factor(sklep_rowerowy$Home.Owner, levels = c("No", "Yes")) 
-)
 str(sklep_rowerowy)
 
-# Wartości odstające
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-glipse(sklep_rowerowy)
-
-
-
-
-
-# 5. Imputacja danych
-# Liczbowe: średnia z obcięciem 10%
-num_vars <- c("Income", "Age", "Children", "Cars")
 sklep_rowerowy <- sklep_rowerowy %>%
-  mutate(across(all_of(num_vars), ~ifelse(is.na(.), mean(., na.rm = TRUE, trim = 0.1), .)))
-
-# Kategoryczne: dominanta
-cat_vars <- c("Marital Status", "Gender", "Home Owner")
-sklep_rowerowy <- sklep_rowerowy %>%
-  mutate(across(all_of(cat_vars), ~ifelse(is.na(.), as.character(stats::mode(.)), .)))
-
-# 6. Konwersja zmiennych kategorycznych na factor
-factor_vars <- c("Marital Status", "Gender", "Education", "Occupation", "Home Owner", "Commute Distance", "Region", "Purchased Bike")
-sklep_rowerowy <- sklep_rowerowy %>% mutate(across(all_of(factor_vars), as.factor))
-
-# 7. Wizualizacja danych
-# Histogramy zmiennych liczbowych
-sklep_rowerowy %>% select(where(is.numeric)) %>%
-  pivot_longer(everything()) %>%
-  ggplot(aes(x = value)) +
-  geom_histogram(bins = 30, fill = "steelblue", color = "white") +
-  facet_wrap(~name, scales = "free") +
-  theme_minimal()
-
-# Wykresy słupkowe dla zmiennych kategorycznych
-sklep_rowerowy %>% select(where(is.factor)) %>%
-  pivot_longer(everything()) %>%
-  ggplot(aes(x = value)) +
-  geom_bar(fill = "skyblue") +
-  facet_wrap(~name, scales = "free") +
-  theme_minimal() +
-  coord_flip()
-
-# 8. Korelacja zmiennych liczbowych
-corr_matrix <- cor(sklep_rowerowy %>% select(where(is.numeric)), use = "complete.obs")
-corrplot(corr_matrix, method = "color", tl.cex = 0.8)
-
-# 10. Budowa modelu drzewa decyzyjnego
-tree_model <- rpart(`Purchased Bike` ~ ., data = train_data, method = "class")
-rpart.plot(tree_model)
-
-pred_tree <- predict(tree_model, test_data, type = "class")
-conf_matrix_tree <- table(Predicted = pred_tree, Actual = test_data$`Purchased Bike`)
-print(conf_matrix_tree)
-
-# 11. Podsumowanie danych
-print(dfSummary(sklep_rowerowy))
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# Data Wrangling
+  mutate(
+    `Marital.Status` = na_if(`Marital.Status`, ""),
+    Gender = na_if(Gender, ""),
+    `Home.Owner` = na_if(`Home.Owner`, ""),
+    `Marital.Status` = factor(`Marital.Status`),
+    Gender = factor(Gender),
+    Education = factor(Education),
+    Occupation = factor(Occupation),
+    `Home.Owner` = factor(`Home.Owner`),
+    `Commute.Distance` = factor(`Commute.Distance`),
+    Region = factor(Region),
+    `Purchased.Bike` = factor(`Purchased.Bike`)
+  )
 str(sklep_rowerowy)
+---
+  
+---
+### Zmienne liczbowe - średnia adaptacyjna
+sklep_rowerowy <- sklep_rowerowy %>%
+  mutate(across(where(is.numeric), ~ ifelse(is.na(.), mean(., na.rm = TRUE, trim = 0.1), .)))
 
-levels(sklep_rowerowy$`Marital Status`) <- c("Married", "Single")
-levels(sklep_rowerowy$`Gender`) <- c("Male", "Female")
-levels(sklep_rowerowy$`Home Owner`) <- c("No", "Yes")
+### Zmienne kategoryczne - imputacja metodą `pmm`
 
+imputed_data <- mice(sklep_rowerowy, m = 5, method = 'pmm', seed = 123)
+sklep_rowerowy <- complete(imputed_data)
 
-### Zdiagnozowanie Braków
-number_of_NA <- sum(is.na(sklep_rowerowy)) 
-(number_of_NA)
-
-brakujace_wiersze <-sklep_rowerowy[complete.cases(sklep_rowerowy) == FALSE, ]
-(brakujace_wiersze)
+sklep_rowerowy
 
 n_miss(sklep_rowerowy)
 
-miss_var_summary(sklep_rowerowy)
-
-vis_miss(sklep_rowerowy) + geom_miss_point()
-
-braki <- miss_var_summary(sklep_rowerowy)
-print(braki)
-
-ggplot(braki, aes(x = variable, y = n_miss)) +
-  geom_bar(stat = "identity") +
-  labs(title = "Liczba braków danych w każdej kolumnie", x = "Kolumna", y = "Liczba braków") +
-  theme_minimal()
-### Obliczanie liczby brakujących wartości (NA) w każdej kolumnie:
-
-### Obliczanie unikatowych wartości w każdej kolumnie:
-
-### Obliczanie proporcji odpowiedzi dla wybranych kategorii:
-
-### Sprawdzanie typu danych w każdej kolumnie
-
-### Zidentyfikowane problemy w bazie danych
-
-# 2. Czyszczenie Danych
-
-### 1. Usuwanie Kolumny “Loan_ID”
-
-### Ustandaryzowanie Danych
-
-# 3. Imputacja Danych
-
-### 4. Tworzenie Data Frame do wizualizacji
-
-# 3. Wartości Odstające
-### 1. Identyfikacja wartości odstających
-
-### 3.1. Definiowanie Funkcji outliers_iqr:
-
-### 3.2. Identyfikacja wartości odstających
+---
+  
+  
+---
+## Wizualizacja braków danych po imputacji
+vis_miss(sklep_rowerowy) +
+  labs(title = "Braki danych po imputacji")
 
 
-# II punkt - Wizualizacja danych
-# 1. Wykresy pudełkowe
-
-# 2 wykresy slupkowe
-
-# wykresy kolowe
-
-# histogramy
-
-# statystyki opisowe
+  sklep_rowerowy %>%
+  select(where(is.numeric)) %>%
+  pivot_longer(everything()) %>%
+  ggplot(aes(x = value)) +
+  geom_histogram(bins = 30, fill = "skyblue", color = "black") +
+  facet_wrap(~ name, scales = "free") +
+  labs(title = "Rozkład zmiennych liczbowych", x = "Wartość", y = "Częstość") +
+  theme_minimal()   # wizualizacja zmiennych liczbowych
 
 
-# korelacja
 
-# macierz korelacji
 
-# podsumowanie 
+sklep_rowerowy %>%
+  select(where(is.factor)) %>%
+  pivot_longer(everything()) %>%
+  ggplot(aes(x = value)) +
+  geom_bar(fill = "steelblue") +
+  facet_wrap(~ name, scales = "free") +
+  labs(title = "Rozkład zmiennych kategorycznych", x = "Kategorie", y = "Liczba obserwacji") +
+  theme_minimal()  #wizualizacja zmiennych kategorycznych
 
+
+---
+
+---
+#Poniższe wykresy przedstawiają rozkłady danych dla wybranych zmiennych kategorycznych.
+
+# `Marital Status`
+ggplot(dane, aes(x = `Marital Status`)) +
+  geom_bar() +
+  labs(title = "Rozkład stanu cywilnego", x = "Stan cywilny", y = "Liczba osób")
+# `Gender`
+ggplot(dane, aes(x = `Gender`)) +
+  geom_bar() +
+  labs(title = "Rozkład płci", x = "Płeć", y = "Liczba osób")
+# `Home Owner`
+ggplot(dane, aes(x = `Home Owner`)) +
+  geom_bar() +
+  labs(title = "Rozkład własności domu", x = "Czy posiada dom", y = "Liczba osób")
+
+# nie działa
+---
+
+
+---
+## Korelacja zmiennych liczbowych
+cor_matrix <- cor(sklep_rowerowy %>% select(where(is.numeric)), use = "complete.obs")
+ggcorrplot(cor_matrix, hc.order = TRUE, type = "lower", lab = TRUE)
+
+
+---
+  
+---
+## Model drzewa decyzyjnego
+set.seed(123)
+train_index <- sample(seq_len(nrow(sklep_rowerowy)), size = 0.7 * nrow(sklep_rowerowy))
+train_data <- sklep_rowerowy[train_index, ]
+test_data <- sklep_rowerowy[-train_index, ]
+
+# Budowa drzewa decyzyjnego
+tree_model <- rpart(`Purchased.Bike` ~ ., data = train_data, method = "class")
+tree_model
+# Wizualizacja drzewa decyzyjnego z ulepszeniami
+rpart.plot(tree_model, type = 4, extra = 104, fallen.leaves = TRUE, 
+           box.palette = "RdBu", shadow.col = "gray", nn = TRUE)
+
+# Przewidywanie na zbiorze testowym
+tree_predictions <- predict(tree_model, test_data, type = "class")
+
+# Macierz pomyłek
+conf_matrix <- table(Predicted = tree_predictions, Actual = test_data$`Purchased.Bike`)
+print(conf_matrix)
+
+# Obliczenie dokładności modelu
+accuracy <- mean(tree_predictions == test_data$`Purchased.Bike`)
+cat("📊 Dokładność modelu drzewa decyzyjnego:", round(accuracy * 100, 2), "%\n")
+---
+---  
+## Segmentacja klientów (Klasteryzacja K-średnich)
+
+cluster_data <- sklep_rowerowy %>% select(where(is.numeric))
+cluster_data_scaled <- scale(cluster_data)
+
+fviz_nbclust(cluster_data_scaled, kmeans, method = "wss")
+
+set.seed(123)
+kmeans_model <- kmeans(cluster_data_scaled, centers = 3, nstart = 25)
+
+fviz_cluster(kmeans_model, data = cluster_data_scaled, geom = "point") +
+  labs(title = "Segmentacja klientów - Klasteryzacja K-średnich")
+
+---
