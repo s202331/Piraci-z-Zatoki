@@ -208,7 +208,7 @@ cluster_data_scaled <- scale(cluster_data)
 fviz_nbclust(cluster_data_scaled, kmeans, method = "wss")
 
 set.seed(123)
-kmeans_model <- kmeans(cluster_data_scaled, centers = 4, nstart = 25)
+kmeans_model <- kmeans(cluster_data_scaled, centers = 3, nstart = 25)
 
 fviz_cluster(kmeans_model, data = cluster_data_scaled, geom = "point") +
   labs(title = "Segmentacja klientów - Klasteryzacja K-średnich")
