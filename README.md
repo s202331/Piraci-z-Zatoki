@@ -1,6 +1,6 @@
 ---
   title: "Zaawansowana Analiza Danych - Sklep Rowerowy"
-author: "Zespół Analityczny"
+author: "Jagoda Chęcińska, Piotr Łukowski, Tomasz Kotliński"
 date: "`r Sys.Date()`"
 output: html_document
 ---
