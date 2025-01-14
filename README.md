@@ -111,25 +111,25 @@ labs(title = "Rozkład zmiennych kategorycznych", x = "Kategorie", y = "Liczba o
 theme_minimal()  #wizualizacja zmiennych kategorycznych
 # Wizualizacje
 # Wykres zakupu rowerów względem regionu
-plot_region <- ggplot(sklep_rowerowy, aes(x = Region, fill = as.factor(`Purchased.Bike`))) +
+  ggplot(sklep_rowerowy, aes(x = Region, fill = Purchased.Bike)) +
+    geom_bar(position = "dodge") +
+    labs(title = "Zakup rowerów względem regionu",
+         x = "Region",
+         y = "Liczba zakupów",
+         fill = "Zakup roweru (No = 0, Yes = 1)") +
+    theme_minimal()
+# Wykres zakupu rowerów względem przejechanych kilometrów
+ggplot(sklep_rowerowy, aes(x = Commute.Distance, fill = Purchased.Bike)) +
   geom_bar(position = "dodge") +
-  labs(title = "Zakup rowerów względem regionu",
-       x = "Region",
+  labs(title = "Zakup rowerów względem przejechanych kilometrów",
+       x = "Dystans dojazdu do pracy",
        y = "Liczba zakupów",
        fill = "Zakup roweru (No = 0, Yes = 1)") +
   theme_minimal()
 
-# Wykres zakupu rowerów względem przejechanych kilometrów
-plot_distance <- ggplot(sklep_rowerowy, aes(x = `Commute.Distance`, fill = as.factor(`Purchased.Bike`))) +
-geom_bar(position = "dodge") +
-labs(title = "Zakup rowerów względem przejechanych kilometrów",
-      x = "Dystans dojazdu do pracy",
-      y = "Liczba zakupów",
-      fill = "Zakup roweru (No = 0, Yes = 1)") +
-theme_minimal()
 
 # Wykres zakupu rowerów względem dochodu
-plot_income <- ggplot(sklep_rowerowy, aes(x = Income, fill = as.factor(`Purchased.Bike`))) +
+ggplot(sklep_rowerowy, aes(x = Income, fill = Purchased.Bike)) +
   geom_histogram(position = "dodge", bins = 30, alpha = 0.7) +
   labs(title = "Dochód klientów względem zakupu roweru",
        x = "Dochód",
