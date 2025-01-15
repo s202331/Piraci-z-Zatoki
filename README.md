@@ -98,9 +98,6 @@ facet_wrap(~ name, scales = "free") +
 labs(title = "Rozkład zmiennych liczbowych", x = "Wartość", y = "Częstość") +
 theme_minimal()   # wizualizacja zmiennych liczbowych
 
-
-
-
 sklep_rowerowy %>%
 select(where(is.factor)) %>%
 pivot_longer(everything()) %>%
@@ -198,7 +195,7 @@ conf_matrix <- table(Predicted = tree_predictions, Actual = test_data$`Purchased
 
 # Obliczenie dokładności modelu
 accuracy <- mean(tree_predictions == test_data$`Purchased.Bike`)
-cat("📊 Dokładność modelu drzewa decyzyjnego:", round(accuracy * 100, 2), "%\n")
+cat(" Dokładność modelu drzewa decyzyjnego:", round(accuracy * 100, 2), "%\n")
 ---
 ---  
 ## Segmentacja klientów (Klasteryzacja K-średnich)
@@ -220,7 +217,6 @@ print(kruskal_test_income_education)
 
 # Test jednorodności wariancji (Levene’a)
 leveneTest(Income ~ Region, data = sklep_rowerowy)
-
 
 
 # Test Shapiro-Wilka dla każdej grupy poziomu wykształcenia
