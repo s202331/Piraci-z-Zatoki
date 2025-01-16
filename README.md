@@ -11,7 +11,7 @@ output: html_document
 ## Data Wrangling
 ### zaladowanie potrzebnych pakietów 
 # Instalacja i załadowanie wszystkich wymaganych pakietów
-install.packages(c("readr", "naniar", "dplyr", "tidyr","car", "ggplot2", "mice", "rpart","ggcorrplot","rpart.plot" ,"gridExtra", "factoextra", "plyr"))
+install.packages(c("readr", "naniar", "dplyr","summarytools", "tidyr","car","psych", "ggplot2", "mice", "rpart","ggcorrplot","rpart.plot" ,"gridExtra", "factoextra", "plyr"))
 library(readr)
 library(naniar)
 library(plyr)
@@ -25,6 +25,8 @@ library(rpart.plot)
 library(factoextra)
 library(gridExtra)
 library(car)
+library(psych)
+library(summarytools)
 ---
 
 ---
@@ -230,3 +232,18 @@ leveneTest(Income ~ Education, data = sklep_rowerowy)
 anova_income_education <- aov(Income ~ Education, data = sklep_rowerowy)
 summary(anova_income_education)
 
+#  Statystyki opisowe dla zmiennych liczbowych
+sklep_rowerowy %>%
+  summarise(across(where(is.numeric), list(
+    mean = ~ mean(.x, na.rm = TRUE),
+    median = ~ median(.x, na.rm = TRUE),
+    sd = ~ sd(.x, na.rm = TRUE)
+  )))
+
+#  Statystyki opisowe dla zmiennych kategorycznych
+sklep_rowerowy %>%
+  summarise(across(where(is.factor), ~ list(table(.))))
+
+#  Podsumowanie statystyk opisowych
+dfSummary(sklep_rowerowy) %>%
+print(method = "pander", file = "podsumowanie_statystykiopisowe.html")
