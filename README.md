@@ -247,3 +247,5 @@ sklep_rowerowy %>%
 #  Podsumowanie statystyk opisowych
 dfSummary(sklep_rowerowy) %>%
 print(method = "pander", file = "podsumowanie_statystykiopisowe.html")
+
+#co dalej
