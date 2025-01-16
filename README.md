@@ -68,9 +68,9 @@ sklep_rowerowy <- sklep_rowerowy %>%
     `Purchased.Bike` = factor(`Purchased.Bike`)
   )
 str(sklep_rowerowy)
----
+
   
----
+
 ### Zmienne liczbowe - średnia adaptacyjna
 sklep_rowerowy <- sklep_rowerowy %>%
 mutate(across(where(is.numeric), ~ ifelse(is.na(.), mean(., na.rm = TRUE, trim = 0.1), .)))
@@ -184,9 +184,20 @@ test_data <- sklep_rowerowy[-train_index, ]
 # Budowa drzewa decyzyjnego
 tree_model <- rpart(`Purchased.Bike` ~ ., data = train_data, method = "class")
 tree_model
-# Wizualizacja drzewa decyzyjnego z ulepszeniami
+# Wizualizacja drzewa decyzyjnego 
 rpart.plot(tree_model, type = 4, extra = 104, fallen.leaves = TRUE, 
-           box.palette = "RdBu", shadow.col = "gray", nn = TRUE)
+           box.palette = "RdBu", shadow.col = "gray", nn = TRUE )
+           
+# Powiększona wizualizacja drzewa decyzyjnego
+rpart.plot(tree_model, 
+           type = 4,              # Styl rozwiniętych gałęzi
+           extra = 104,           # Klasy, procenty, liczebności
+           fallen.leaves = TRUE,  # Liście wyrównane do dołu
+           box.palette = "RdBu",  # Kolorowe pudełka
+           shadow.col = "gray",   # Cień dla efektu 3D
+           nn = TRUE,             # Numery węzłów
+           cex = 1.1)             # Większa czcionka (domyślnie 1.0)
+
 
 # Przewidywanie na zbiorze testowym
 tree_predictions <- predict(tree_model, test_data, type = "class")
