@@ -241,4 +241,4 @@ sklep_rowerowy %>% summarise(across(where(is.factor), ~ list(table(.))))
 dfSummary(sklep_rowerowy) %>% print(method = "pander", file = "podsumowanie_statystykiopisowe.html")
 
 #co dalej up
-blaganm dziala>
+blaganm dziala> PDW
