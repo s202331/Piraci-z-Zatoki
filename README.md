@@ -199,7 +199,8 @@ cat(" Dokładność modelu drzewa decyzyjnego:", round(accuracy * 100, 2), "%\n"
 
 ## Segmentacja klientów (Klasteryzacja K-średnich)
 
-cluster_data <- sklep_rowerowy %>% select(where(is.numeric)) cluster_data_scaled <- scale(cluster_data)
+cluster_data <- sklep_rowerowy %>% select(where(is.numeric)) 
+cluster_data_scaled <- scale(cluster_data)
 
 fviz_nbclust(cluster_data_scaled, kmeans, method = "wss")
 
