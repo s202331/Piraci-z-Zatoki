@@ -67,7 +67,7 @@ sklep_rowerowy <- sklep_rowerowy %>%
   )
 str(sklep_rowerowy)
 ---
-  
+
 ---
 ### Zmienne liczbowe - średnia adaptacyjna
 sklep_rowerowy <- sklep_rowerowy %>%
@@ -81,10 +81,8 @@ sklep_rowerowy <- complete(imputed_data)
 sklep_rowerowy
 
 n_miss(sklep_rowerowy)
-
 ---
-  
-  
+
 ---
 ## Wizualizacja braków danych po imputacji
 vis_miss(sklep_rowerowy) + labs(title = "Braki danych po imputacji")
@@ -145,35 +143,21 @@ ggplot(sklep_rowerowy, aes(x = Region, y = Income, fill = Region)) +
        x = "Region",
        y = "Dochód") +
   theme_minimal()
-
 ---
+
 #Poniższe wykresy przedstawiają rozkłady danych dla wybranych zmiennych kategorycznych.
 
 # Marital Status
-ggplot(sklep_rowerowy, aes(x = `Marital.Status`)) +
-  geom_bar() +
-  labs(title = "Rozkład stanu cywilnego", x = "Stan cywilny", y = "Liczba osób")
-# Gender 
-ggplot(sklep_rowerowy, aes(x = `Gender`)) +
-  geom_bar() +
-  labs(title = "Rozkład płci", x = "Płeć", y = "Liczba osób")
-#  Home Owner
-ggplot(sklep_rowerowy, aes(x = `Home.Owner`)) +
-  geom_bar() +
-  labs(title = "Rozkład własności domu", x = "Czy posiada dom", y = "Liczba osób")
 
+ggplot(sklep_rowerowy, aes(x = `Marital.Status`)) + geom_bar() + labs(title = "Rozkład stanu cywilnego", x = "Stan cywilny", y = "Liczba osób") \# Gender ggplot(sklep_rowerowy, aes(x = `Gender`)) + geom_bar() + labs(title = "Rozkład płci", x = "Płeć", y = "Liczba osób") \# Home Owner ggplot(sklep_rowerowy, aes(x = `Home.Owner`)) + geom_bar() + labs(title = "Rozkład własności domu", x = "Czy posiada dom", y = "Liczba osób")
 
----
-
+------------------------------------------------------------------------
 
 ---
 ## Korelacja zmiennych liczbowych
 cor_matrix <- cor(sklep_rowerowy %>% select(where(is.numeric)), use = "complete.obs")
 ggcorrplot(cor_matrix, hc.order = TRUE, type = "lower", lab = TRUE)
-
-
 ---
-
 
 ---
 ## Model drzewa decyzyjnego
@@ -200,37 +184,35 @@ conf_matrix <- table(Predicted = tree_predictions, Actual = test_data$`Purchased
 accuracy <- mean(tree_predictions == test_data$`Purchased.Bike`)
 cat("📊 Dokładność modelu drzewa decyzyjnego:", round(accuracy * 100, 2), "%\n")
 ---
----  
+
+------------------------------------------------------------------------
+
 ## Segmentacja klientów (Klasteryzacja K-średnich)
-cluster_data <- sklep_rowerowy %>% select(where(is.numeric))
-cluster_data_scaled <- scale(cluster_data)
+
+cluster_data \<- sklep_rowerowy %\>% select(where(is.numeric)) cluster_data_scaled \<- scale(cluster_data)
 
 fviz_nbclust(cluster_data_scaled, kmeans, method = "wss")
 
-set.seed(123)
-kmeans_model <- kmeans(cluster_data_scaled, centers = 4, nstart = 25)
+set.seed(123) kmeans_model \<- kmeans(cluster_data_scaled, centers = 4, nstart = 25)
 
-fviz_cluster(kmeans_model, data = cluster_data_scaled, geom = "point") +
-  labs(title = "Segmentacja klientów - Klasteryzacja K-średnich")
-
+fviz_cluster(kmeans_model, data = cluster_data_scaled, geom = "point") + labs(title = "Segmentacja klientów - Klasteryzacja K-średnich")
 
 # Test Kruskala-Wallisa dla dochodu a zakupu roweru
-kruskal_test_income_education <- kruskal.test(Income ~ Education, data = sklep_rowerowy)
-print(kruskal_test_income_education)
+
+kruskal_test_income_education \<- kruskal.test(Income \~ Education, data = sklep_rowerowy) print(kruskal_test_income_education)
 
 # Test jednorodności wariancji (Levene’a)
-leveneTest(Income ~ Region, data = sklep_rowerowy)
 
-
+leveneTest(Income \~ Region, data = sklep_rowerowy)
 
 # Test Shapiro-Wilka dla każdej grupy poziomu wykształcenia
+
 by(sklep_rowerowy$Income, sklep_rowerowy$Education, shapiro.test)
 
 # Test jednorodności wariancji (Levene’a) dla poziomu wykształcenia
-leveneTest(Income ~ Education, data = sklep_rowerowy)
 
+leveneTest(Income \~ Education, data = sklep_rowerowy)
 
 # Test ANOVA dla dochodów w zależności od poziomu wykształcenia
-anova_income_education <- aov(Income ~ Education, data = sklep_rowerowy)
-summary(anova_income_education)
 
+anova_income_education \<- aov(Income \~ Education, data = sklep_rowerowy) summary(anova_income_education) #hg
