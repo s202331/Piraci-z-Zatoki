@@ -150,7 +150,7 @@ ggplot(sklep_rowerowy, aes(x = Region, y = Income, fill = Region)) +
 
 ggplot(sklep_rowerowy, aes(x = `Marital.Status`)) + geom_bar() + labs(title = "Rozkład stanu cywilnego", x = "Stan cywilny", y = "Liczba osób") \# Gender ggplot(sklep_rowerowy, aes(x = `Gender`)) + geom_bar() + labs(title = "Rozkład płci", x = "Płeć", y = "Liczba osób") \# Home Owner ggplot(sklep_rowerowy, aes(x = `Home.Owner`)) + geom_bar() + labs(title = "Rozkład własności domu", x = "Czy posiada dom", y = "Liczba osób")
 
-------------------------------------------------------------------------
+---
 
 ---
 ## Korelacja zmiennych liczbowych
@@ -199,21 +199,22 @@ cat(" Dokładność modelu drzewa decyzyjnego:", round(accuracy * 100, 2), "%\n"
 
 ## Segmentacja klientów (Klasteryzacja K-średnich)
 
-cluster_data \<- sklep_rowerowy %\>% select(where(is.numeric)) cluster_data_scaled \<- scale(cluster_data)
+cluster_data <- sklep_rowerowy %>% select(where(is.numeric)) 
+cluster_data_scaled <- scale(cluster_data)
 
 fviz_nbclust(cluster_data_scaled, kmeans, method = "wss")
 
-set.seed(123) kmeans_model \<- kmeans(cluster_data_scaled, centers = 3, nstart = 25)
+set.seed(123) kmeans_model <- kmeans(cluster_data_scaled, centers = 3, nstart = 25)
 
 fviz_cluster(kmeans_model, data = cluster_data_scaled, geom = "point") + labs(title = "Segmentacja klientów - Klasteryzacja K-średnich")
 
 # Test Kruskala-Wallisa dla dochodu a zakupu roweru
 
-kruskal_test_income_education \<- kruskal.test(Income \~ Education, data = sklep_rowerowy) print(kruskal_test_income_education)
+kruskal_test_income_education <- kruskal.test(Income ~ Education, data = sklep_rowerowy) print(kruskal_test_income_education)
 
 # Test jednorodności wariancji (Levene’a)
 
-leveneTest(Income \~ Region, data = sklep_rowerowy)
+leveneTest(Income ~ Region, data = sklep_rowerowy)
 
 # Test Shapiro-Wilka dla każdej grupy poziomu wykształcenia
 
@@ -221,22 +222,22 @@ by(sklep_rowerowy$Income, sklep_rowerowy$Education, shapiro.test)
 
 # Test jednorodności wariancji (Levene’a) dla poziomu wykształcenia
 
-leveneTest(Income \~ Education, data = sklep_rowerowy)
+leveneTest(Income ~ Education, data = sklep_rowerowy)
 
 # Test ANOVA dla dochodów w zależności od poziomu wykształcenia
 
-anova_income_education \<- aov(Income \~ Education, data = sklep_rowerowy) summary(anova_income_education)
+anova_income_education <- aov(Income ~ Education, data = sklep_rowerowy) summary(anova_income_education)
 
 # Statystyki opisowe dla zmiennych liczbowych
 
-sklep_rowerowy %\>% summarise(across(where(is.numeric), list( mean = \~ mean(.x, na.rm = TRUE), median = \~ median(.x, na.rm = TRUE), sd = \~ sd(.x, na.rm = TRUE) )))
+sklep_rowerowy %>% summarise(across(where(is.numeric), list( mean = ~ mean(.x, na.rm = TRUE), median = ~ median(.x, na.rm = TRUE), sd = ~ sd(.x, na.rm = TRUE) )))
 
 # Statystyki opisowe dla zmiennych kategorycznych
 
-sklep_rowerowy %\>% summarise(across(where(is.factor), \~ list(table(.))))
+sklep_rowerowy %>% summarise(across(where(is.factor), ~ list(table(.))))
 
 # Podsumowanie statystyk opisowych
 
-dfSummary(sklep_rowerowy) %\>% print(method = "pander", file = "podsumowanie_statystykiopisowe.html")
+dfSummary(sklep_rowerowy) %>% print(method = "pander", file = "podsumowanie_statystykiopisowe.html")
 
 #co dalej
