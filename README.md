@@ -148,7 +148,9 @@ ggplot(sklep_rowerowy, aes(x = Region, y = Income, fill = Region)) +
 
 # Marital Status
 
-ggplot(sklep_rowerowy, aes(x = `Marital.Status`)) + geom_bar() + labs(title = "Rozkład stanu cywilnego", x = "Stan cywilny", y = "Liczba osób") \# Gender ggplot(sklep_rowerowy, aes(x = `Gender`)) + geom_bar() + labs(title = "Rozkład płci", x = "Płeć", y = "Liczba osób") \# Home Owner ggplot(sklep_rowerowy, aes(x = `Home.Owner`)) + geom_bar() + labs(title = "Rozkład własności domu", x = "Czy posiada dom", y = "Liczba osób")
+ggplot(sklep_rowerowy, aes(x = `Marital.Status`)) + geom_bar() + labs(title = "Rozkład stanu cywilnego", x = "Stan cywilny", y = "Liczba osób") 
+Gender ggplot(sklep_rowerowy, aes(x = `Gender`)) + geom_bar() + labs(title = "Rozkład płci", x = "Płeć", y = "Liczba osób") 
+Home Owner ggplot(sklep_rowerowy, aes(x = `Home.Owner`)) + geom_bar() + labs(title = "Rozkład własności domu", x = "Czy posiada dom", y = "Liczba osób")
 
 ------------------------------------------------------------------------
 
