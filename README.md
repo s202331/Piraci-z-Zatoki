@@ -1,11 +1,10 @@
----
-  title: "Sklep rowerowy Analysis"
+title: "Sklep rowerowy Analysis"
 author: "Jagoda Chęcińska, Piotr Łukowski, Tomasz Kotliński"
 date: "`r Sys.Date()`"
 output: html_document
----
 
----
+
+
 # Piraci-z-Zatoki sklep rowerowy
 ### Wstep Klienci sklepu rowerowego wzięli udział w ankiecie, w której dostarczyli szczegółowe informacje na swój temat, takie jak status cywilny, płeć, poziom dochodów, liczba dzieci, poziom wykształcenia, wykonywany zawód, status posiadania domu, liczba samochodów, odległość do miejsca pracy, region zamieszkania oraz wiek. W badaniu uwzględniono również informację, czy klient zakupił rower. Celem analizy jest określenie, które z tych czynników mają największy wpływ na decyzję o zakupie roweru.
 ## Data Wrangling
@@ -27,9 +26,7 @@ library(gridExtra)
 library(car)
 library(psych)
 library(summarytools)
----
 
----
 # Podstawowa Analiza braków
 n_miss(sklep_rowerowy) # Sprawdzamy ilość NA w pliku
 
@@ -83,9 +80,7 @@ sklep_rowerowy <- complete(imputed_data)
 sklep_rowerowy
 
 n_miss(sklep_rowerowy)
----
 
----
 ## Wizualizacja braków danych po imputacji
 vis_miss(sklep_rowerowy) + labs(title = "Braki danych po imputacji")
 
@@ -142,7 +137,7 @@ ggplot(sklep_rowerowy, aes(x = Region, y = Income, fill = Region)) +
        x = "Region",
        y = "Dochód") +
   theme_minimal()
----
+
 
 #Poniższe wykresy przedstawiają rozkłady danych dla wybranych zmiennych kategorycznych.
 
@@ -152,15 +147,11 @@ ggplot(sklep_rowerowy, aes(x = `Marital.Status`)) + geom_bar() + labs(title = "R
 Gender ggplot(sklep_rowerowy, aes(x = `Gender`)) + geom_bar() + labs(title = "Rozkład płci", x = "Płeć", y = "Liczba osób") 
 Home Owner ggplot(sklep_rowerowy, aes(x = `Home.Owner`)) + geom_bar() + labs(title = "Rozkład własności domu", x = "Czy posiada dom", y = "Liczba osób")
 
-------------------------------------------------------------------------
 
----
 ## Korelacja zmiennych liczbowych
 cor_matrix <- cor(sklep_rowerowy %>% select(where(is.numeric)), use = "complete.obs")
 ggcorrplot(cor_matrix, hc.order = TRUE, type = "lower", lab = TRUE)
----
 
----
 ## Model drzewa decyzyjnego
 set.seed(123)
 train_index <- sample(seq_len(nrow(sklep_rowerowy)), size = 0.7 * nrow(sklep_rowerowy))
@@ -195,9 +186,7 @@ conf_matrix <- table(Predicted = tree_predictions, Actual = test_data$`Purchased
 # Obliczenie dokładności modelu
 accuracy <- mean(tree_predictions == test_data$`Purchased.Bike`)
 cat(" Dokładność modelu drzewa decyzyjnego:", round(accuracy * 100, 2), "%\n")
----
 
-------------------------------------------------------------------------
 
 ## Segmentacja klientów (Klasteryzacja K-średnich)
 
