@@ -139,6 +139,7 @@ ggplot(sklep_rowerowy, aes(x = Region, y = Income, fill = Region)) +
   theme_minimal()
 
 
+
 #Poniższe wykresy przedstawiają rozkłady danych dla wybranych zmiennych kategorycznych.
 
 # Marital Status
