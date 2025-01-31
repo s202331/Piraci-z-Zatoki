@@ -6,7 +6,7 @@ output: html_document
 
 
 # Piraci-z-Zatoki sklep rowerowy
-### Wstep Klienci sklepu rowerowego wzięli udział w ankiecie, w której dostarczyli szczegółowe informacje na swój temat, takie jak status cywilny, płeć, poziom dochodów, liczba dzieci, poziom wykształcenia, wykonywany zawód, status posiadania domu, liczba samochodów, odległość do miejsca pracy, region zamieszkania oraz wiek. W badaniu uwzględniono również informację, czy klient zakupił rower. Celem analizy jest określenie, które z tych czynników mają największy wpływ na decyzję o zakupie roweru.
+### Wstęp: Klienci sklepu rowerowego wzięli udział w ankiecie, w której dostarczyli szczegółowych informacji na swój temat, takich jak status cywilny, płeć, poziom dochodów, liczba dzieci, poziom wykształcenia, wykonywany zawód, status posiadania domu, liczba samochodów, odległość do miejsca pracy, region zamieszkania oraz wiek. W badaniu uwzględniono również informację, czy klient zakupił rower. Celem analizy jest określenie, które z tych czynników mają największy wpływ na decyzję o zakupie roweru.
 ## Data Wrangling
 ### zaladowanie potrzebnych pakietów 
 # Instalacja i załadowanie wszystkich wymaganych pakietów
