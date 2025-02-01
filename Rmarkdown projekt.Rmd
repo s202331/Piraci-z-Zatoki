@@ -376,7 +376,7 @@ library(summarytools)
 dfSummary(sklep_rowerowy) %>% print(method = "pander", file = "podsumowanie_statystykiopisowe.html")
 ```
 
-# 
+# Test kruskala widzę że mamy w 2 miejscch w anova i w test kruskala to bedzie trzeba wybrac gdzie go wstawić
 
 # 
 
