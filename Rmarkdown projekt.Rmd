@@ -48,3 +48,42 @@ library(summarytools)
 read.csv("sklep_rowerowy.csv")
 sklep_rowerowy <- read.csv("sklep_rowerowy.csv")
 ```
+
+# Podstawowa analiza braków
+
+## Identyfikacja braków w danych
+
+```{r}
+n_miss(sklep_rowerowy) # Sprawdzamy ilość NA w pliku
+vis_miss(sklep_rowerowy) # Wizualizacja NA
+miss_var_summary(sklep_rowerowy) # Podsumowanie braków w kolumnach
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
