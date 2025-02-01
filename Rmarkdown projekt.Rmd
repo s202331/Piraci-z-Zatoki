@@ -3,26 +3,33 @@ title: "Analiza Sklepu Rowerowego"
 author: "Jagoda Chęcińska, Piotr Łukowski, Tomasz Kotliński"
 date: "`r Sys.Date()`"
 output: html_document
+editor_options: 
+  markdown: 
+    wrap: 72
 ---
 
 # Piraci-z-Zatoki: Analiza Sklepu Rowerowego
 
 ## Wstęp
 
-Klienci sklepu rowerowego wzięli udział w ankiecie, w której dostarczyli szczegółowe informacje na swój temat, takie jak: status cywilny, płeć, poziom dochodów, liczba dzieci, poziom wykształcenia, wykonywany zawód, status posiadania domu, liczba samochodów, odległość do miejsca pracy, region zamieszkania oraz wiek. 
+Klienci sklepu rowerowego wzięli udział w ankiecie, w której dostarczyli
+szczegółowe informacje na swój temat, takie jak: status cywilny, płeć,
+poziom dochodów, liczba dzieci, poziom wykształcenia, wykonywany zawód,
+status posiadania domu, liczba samochodów, odległość do miejsca pracy,
+region zamieszkania oraz wiek.
 
-Celem analizy jest określenie, które z tych czynników mają największy wpływ na decyzję o zakupie roweru.
+Celem analizy jest określenie, które z tych czynników mają największy
+wpływ na decyzję o zakupie roweru.
 
-## Przygotowanie danych
+------------------------------------------------------------------------
 
-### Załadowanie pakietów
+## Data Wrangling
 
-```{
-# Instalacja i załadowanie wymaganych pakietów
-install.packages(c("readr", "naniar", "dplyr", "summarytools", "tidyr", 
-                   "car", "psych", "ggplot2", "mice", "rpart", 
-                   "ggcorrplot", "rpart.plot", "gridExtra", "factoextra", "plyr"))
-
+```{r}
+# Instalacja i załadowanie wszystkich wymaganych pakietów
+install.packages(c("readr", "naniar", "dplyr","summarytools", "tidyr","car","psych", 
+                   "ggplot2", "mice", "rpart","ggcorrplot","rpart.plot", "gridExtra", 
+                   "factoextra", "plyr"))
 library(readr)
 library(naniar)
 library(plyr)
@@ -38,4 +45,6 @@ library(gridExtra)
 library(car)
 library(psych)
 library(summarytools)
-
+read.csv("sklep_rowerowy.csv")
+sklep_rowerowy <- read.csv("sklep_rowerowy.csv")
+```
