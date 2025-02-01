@@ -253,7 +253,7 @@ conf_matrix
 accuracy <- mean(tree_predictions == test_data$`Purchased.Bike`)
 cat("Dokładność modelu drzewa decyzyjnego:", round(accuracy * 100, 2), "%\n")
 ```
-
+Model drzewa decyzyjnego poprawnie przewidział **98 przypadków "No"** i **77 przypadków "Yes"**, ale popełnił **71 błędów fałszywie negatywnych** i **54 fałszywie pozytywne**. Jego dokładność wynosi **58,33%**, co oznacza, że klasyfikuje poprawnie nieco ponad połowę przypadków. Wynik wskazuje na umiarkowaną skuteczność, sugerując potrzebę dalszej optymalizacji modelu.
 # Segmentacja klientów (Klasteryzacja K-średnich)
 
 ```{r}
