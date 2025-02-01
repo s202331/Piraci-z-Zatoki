@@ -253,8 +253,14 @@ conf_matrix
 accuracy <- mean(tree_predictions == test_data$`Purchased.Bike`)
 cat("Dokładność modelu drzewa decyzyjnego:", round(accuracy * 100, 2), "%\n")
 ```
-Model drzewa decyzyjnego poprawnie przewidział **98 przypadków "No"** i **77 przypadków "Yes"**, ale popełnił **71 błędów fałszywie negatywnych** i **54 fałszywie pozytywne**. Jego dokładność wynosi **58,33%**, co oznacza, że klasyfikuje poprawnie nieco ponad połowę przypadków. Wynik wskazuje na umiarkowaną skuteczność, sugerując potrzebę dalszej optymalizacji modelu.
-# Segmentacja klientów (Klasteryzacja K-średnich)
+
+Model drzewa decyzyjnego poprawnie przewidział **98 przypadków "No"** i
+**77 przypadków "Yes"**, ale popełnił **71 błędów fałszywie
+negatywnych** i **54 fałszywie pozytywne**. Jego dokładność wynosi
+**58,33%**, co oznacza, że klasyfikuje poprawnie nieco ponad połowę
+przypadków. Wynik wskazuje na umiarkowaną skuteczność, sugerując
+potrzebę dalszej optymalizacji modelu. \# Segmentacja klientów
+(Klasteryzacja K-średnich)
 
 ```{r}
 # Przygotowanie danych do klasteryzacji: wybieramy tylko zmienne liczbowe i je standaryzujemy.
@@ -281,7 +287,14 @@ fviz_cluster(kmeans_model, data = cluster_data_scaled, geom = "point") +
 kruskal_test_income_education <- kruskal.test(Income ~ Education, data = sklep_rowerowy)
 print(kruskal_test_income_education)
 ```
-Test Kruskala-Wallisa został przeprowadzony w celu zbadania różnic w dochodach według poziomu wykształcenia. Wyniki testu wskazują na statystykę chi-kwadrat wynoszącą 119.15 przy 4 stopniach swobody, co sugeruje istotne różnice między grupami. P-value jest znacznie mniejsza niż poziom istotności α = 0.05, co pozwala na odrzucenie hipotezy zerowej. Istnieją statystycznie istotne różnice w medianach dochodów w zależności od poziomu wykształcenia.
+
+Test Kruskala-Wallisa został przeprowadzony w celu zbadania różnic w
+dochodach według poziomu wykształcenia. Wyniki testu wskazują na
+statystykę chi-kwadrat wynoszącą 119.15 przy 4 stopniach swobody, co
+sugeruje istotne różnice między grupami. P-value jest znacznie mniejsza
+niż poziom istotności α = 0.05, co pozwala na odrzucenie hipotezy
+zerowej. Istnieją statystycznie istotne różnice w medianach dochodów w
+zależności od poziomu wykształcenia.
 
 # Test jednorodności wariancji (Levene’a)
 
@@ -293,9 +306,15 @@ leveneTest(Income ~ Region, data = sklep_rowerowy)
 # Testujemy jednorodność wariancji dochodów dla poziomu wykształcenia.
 leveneTest(Income ~ Education, data = sklep_rowerowy)
 ```
+
 Test Levene’a (sprawdzenie jednorodność wariancji)
 
-Test Levene’a wykazał istotne statystycznie różnice w wariancji dochodów między grupami wykształcenia, co potwierdzają wartości F = 15,435; p = 2,503e-07 (dla 2 grup) oraz F = 2,5284; p = 0,03922 (dla 4 grup). Otrzymane wyniki wskazują na naruszenie założenia homogeniczności wariancji, co sugeruje, że rozkład dochodów nie jest jednorodny w analizowanych grupach. 
+Test Levene’a wykazał istotne statystycznie różnice w wariancji dochodów
+między grupami wykształcenia, co potwierdzają wartości F = 15,435; p =
+2,503e-07 (dla 2 grup) oraz F = 2,5284; p = 0,03922 (dla 4 grup).
+Otrzymane wyniki wskazują na naruszenie założenia homogeniczności
+wariancji, co sugeruje, że rozkład dochodów nie jest jednorodny w
+analizowanych grupach.
 
 # Test Shapiro-Wilka dla każdej grupy poziomu wykształcenia
 
@@ -303,11 +322,12 @@ Test Levene’a wykazał istotne statystycznie różnice w wariancji dochodów m
 # Sprawdzamy normalność rozkładu dochodów w każdej grupie wykształcenia.
 by(sklep_rowerowy$Income, sklep_rowerowy$Education, shapiro.test)
 ```
-
-# Test ANOVA dla dochodów w zależności od poziomu wykształcenia _ usunęłam test ANOVA, bo nie mamy spełnionego założenia o noemalności, dlatego zrobiłam inny test, tym razem nieparametryczny kruskala-willisa 
-
+Dla wszystkich pięciu poziomów wykształcenia wyniki testu Shapiro-Wilka wskazują na brak normalności rozkładów dochodów, ponieważ w każdym przypadku wartość p jest mniejsza niż 0.05.
+Brak normalności danych w każdej z grup oznacza, że założenie o normalnym rozkładzie danych, wymagane w testach parametrycznych takich jak ANOVA, jest naruszone. W takim przypadku nie należy stosować testu ANOVA, ponieważ może to prowadzić do błędnych wniosków. Zamiast tego, do analizy użyto testu nieparametrycznego Kruskala-Wallisa, który nie wymaga założenia normalności rozkładu.
+# Test ANOVA dla dochodów w zależności od poziomu wykształcenia \_ usunęłam test ANOVA, bo nie mamy spełnionego założenia o noemalności, dlatego zrobiłam inny test, tym razem nieparametryczny kruskala-willisa
 
 # Przeprowadzamy test Kruskal-Wallisa dla dochodów w zależności od poziomu wykształcenia
+
 ```{r}
 # Przeprowadzenie testu Kruskal-Wallisa
 kruskal_income_education <- kruskal.test(Income ~ Education, data = sklep_rowerowy)
@@ -316,7 +336,15 @@ kruskal_income_education <- kruskal.test(Income ~ Education, data = sklep_rowero
 print(kruskal_income_education)
 
 ```
-Test Kruskala-Wallisa to nieparametryczny test statystyczny, który jest używany do porównania median w więcej niż dwóch grupach. Wartość chi-kwadrat wynosi 119,15, co  wskazuje na istotną różnicę między grupami w analizowanej zmiennej - dochodach. Bardzo mała wartość p (< 2.2e-16) sugeruje, że różnice między grupami są statystycznie istotne. Na podstawie tych wyników, hipoteza zerowa, mówiąca o braku różnic w medianach dochodów, zostaje odrzucona, co oznacza, że dochody różnią się w zależności od poziomu wykształcenia.
+
+Test Kruskala-Wallisa to nieparametryczny test statystyczny, który jest
+używany do porównania median w więcej niż dwóch grupach. Wartość
+chi-kwadrat wynosi 119,15, co wskazuje na istotną różnicę między grupami
+w analizowanej zmiennej - dochodach. Bardzo mała wartość p (\< 2.2e-16)
+sugeruje, że różnice między grupami są statystycznie istotne. Na
+podstawie tych wyników, hipoteza zerowa, mówiąca o braku różnic w
+medianach dochodów, zostaje odrzucona, co oznacza, że dochody różnią się
+w zależności od poziomu wykształcenia.
 
 # Statystyki opisowe dla zmiennych liczbowych
 
