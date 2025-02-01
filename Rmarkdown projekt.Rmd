@@ -304,12 +304,17 @@ Test Levene’a wykazał istotne statystycznie różnice w wariancji dochodów m
 by(sklep_rowerowy$Income, sklep_rowerowy$Education, shapiro.test)
 ```
 
-# Test ANOVA dla dochodów w zależności od poziomu wykształcenia
+# Test ANOVA dla dochodów w zależności od poziomu wykształcenia _ usunęłam test ANOVA, bo nie mamy spełnionego założenia o noemalności, dlatego zrobiłam inny test, tym razem nieparametryczny kruskala-willisa 
 
+
+# Przeprowadzamy test Kruskal-Wallisa dla dochodów w zależności od poziomu wykształcenia
 ```{r}
-# Przeprowadzamy analizę wariancji (ANOVA) dla dochodów w zależności od poziomu wykształcenia.
-anova_income_education <- aov(Income ~ Education, data = sklep_rowerowy)
-summary(anova_income_education)
+# Przeprowadzenie testu Kruskal-Wallisa
+kruskal_income_education <- kruskal.test(Income ~ Education, data = sklep_rowerowy)
+
+# Wyświetlenie wyników testu
+print(kruskal_income_education)
+
 ```
 
 # Statystyki opisowe dla zmiennych liczbowych
