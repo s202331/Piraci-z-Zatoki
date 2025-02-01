@@ -136,7 +136,7 @@ Rozkład zmiennych kategorycznych:
 - rozkład płci jest dość równomierny między kobietami a mężczyznami
 - większość respondentów jest właścicielami domów
 - większosć osób nie zakupiła roweru
-- najwięcej badanych pokonuje krótki dystans 0-1 mili
+- najwięcej badanych pokonuje krótki dystans do pracy 0-1 mili
 ------------------------------------------------------------------------
 
 ## Analiza Rozkładu Zmiennych Liczbowych
