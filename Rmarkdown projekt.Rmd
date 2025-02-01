@@ -198,6 +198,7 @@ ggplot(sklep_rowerowy, aes(x = Region, y = Income, fill = Region)) +
 cor_matrix <- cor(sklep_rowerowy %>% select(where(is.numeric)), use = "complete.obs")
 ggcorrplot(cor_matrix, hc.order = TRUE, type = "lower", lab = TRUE)
 ```
+Największa liczba zakupów rowerów występuje w przypadku osób pokonujących krótkie dystanse (0-1 mili) do pracy, co sugeruje, że im krótszy dystans do pracy, tym większa skłonność do zakupu roweru. # czy umiecie zrobic tak żeby 10+ miles było na końcu wykresu, nie w środku, bo kategorie na osi poziomej rosna nie tak jak powinny, ja cos probowałam ale nie wyszło mi to przestawianie
 
 Z wykresu pudełkowego mozna odczytać, że klienci z regionu Pacyfiku mają
 najwyższe dochody, z medianą wyższą niż w pozostałych regionach, oraz
