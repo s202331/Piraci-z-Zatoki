@@ -94,6 +94,7 @@ sklep_rowerowy <- sklep_rowerowy %>%
     `Purchased.Bike` = factor(`Purchased.Bike`)
   )
 ```
+
 # Imputacja Danych
 
 ```{r}
@@ -294,23 +295,5 @@ sklep_rowerowy %>% summarise(across(where(is.factor), ~list(table(.))))
 library(summarytools)
 dfSummary(sklep_rowerowy) %>% print(method = "pander", file = "podsumowanie_statystykiopisowe.html")
 ```
+
 # 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
