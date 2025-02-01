@@ -29,28 +29,28 @@ library(gridExtra) library(car) library(psych) library(summarytools)
 
 # Podstawowa analiza braków danych
 
-n_miss(sklep_rowerowy) \# Sprawdzamy ilość NA w pliku
+n_miss(sklep_rowerowy) # Sprawdzamy ilość NA w pliku
 
-vis_miss(sklep_rowerowy) \# wizualizacja NA
+vis_miss(sklep_rowerowy) # wizualizacja NA
 
-miss_var_summary(sklep_rowerowy) \# Podsumowanie braków w kolumnach
+miss_var_summary(sklep_rowerowy) # Podsumowanie braków w kolumnach
 
-braki_procent \<- sklep_rowerowy %\>% summarise(across(everything(), \~
-mean(is.na(.)) \* 100)) %\>% pivot_longer(everything(), names_to =
+braki_procent <- sklep_rowerowy %>% summarise(across(everything(), ~
+mean(is.na(.)) * 100)) %>% pivot_longer(everything(), names_to =
 "Kolumna", values_to = "Procent")
 
 ggplot(braki_procent, aes(x = reorder(Kolumna, -Procent), y =
 Procent)) + geom_bar(stat = "identity", fill = "steelblue") +
 coord_flip() + labs(title = "Procent brakujących danych w kolumnach", x
-= "Kolumna", y = "% braków") + theme_minimal() \# wizualizacja
+= "Kolumna", y = "% braków") + theme_minimal() # wizualizacja
 procentowa braków w każdej kolumnie
 
-vis_miss(sklep_rowerowy, cluster = TRUE) \# Klasteryzacja braków dla
+vis_miss(sklep_rowerowy, cluster = TRUE) # Klasteryzacja braków dla
 porównania różnych kolumn
 
 str(sklep_rowerowy)
 
-sklep_rowerowy \<- sklep_rowerowy %\>% mutate( `Marital.Status` =
+sklep_rowerowy <- sklep_rowerowy %>% mutate( `Marital.Status` =
 na_if(`Marital.Status`, ""), Gender = na_if(Gender, ""), `Home.Owner` =
 na_if(`Home.Owner`, ""), `Marital.Status` = factor(`Marital.Status`),
 Gender = factor(Gender), Education = factor(Education), Occupation =
@@ -61,13 +61,13 @@ str(sklep_rowerowy)
 
 ### Zmienne liczbowe - średnia adaptacyjna
 
-sklep_rowerowy \<- sklep_rowerowy %\>% mutate(across(where(is.numeric),
-\~ ifelse(is.na(.), mean(., na.rm = TRUE, trim = 0.1), .)))
+sklep_rowerowy <- sklep_rowerowy %>% mutate(across(where(is.numeric),
+~ ifelse(is.na(.), mean(., na.rm = TRUE, trim = 0.1), .)))
 
 ### Zmienne kategoryczne - imputacja metodą `pmm`
 
-imputed_data \<- mice(sklep_rowerowy, m = 5, method = 'pmm', seed = 123)
-sklep_rowerowy \<- complete(imputed_data)
+imputed_data <- mice(sklep_rowerowy, m = 5, method = 'pmm', seed = 123)
+sklep_rowerowy <- complete(imputed_data)
 
 sklep_rowerowy
 
@@ -77,23 +77,23 @@ n_miss(sklep_rowerowy)
 
 vis_miss(sklep_rowerowy) + labs(title = "Braki danych po imputacji")
 
-sklep_rowerowy %\>% select(where(is.numeric)) %\>%
-pivot_longer(everything()) %\>% ggplot(aes(x = value)) +
+sklep_rowerowy %>% select(where(is.numeric)) %>%
+pivot_longer(everything()) %>% ggplot(aes(x = value)) +
 geom_histogram(bins = 30, fill = "skyblue", color = "black") +
-facet_wrap(\~ name, scales = "free") + labs(title = "Rozkład zmiennych
-liczbowych", x = "Wartość", y = "Częstość") + theme_minimal() \#
+facet_wrap(~ name, scales = "free") + labs(title = "Rozkład zmiennych
+liczbowych", x = "Wartość", y = "Częstość") + theme_minimal() #
 wizualizacja zmiennych liczbowych
 
-sklep_rowerowy %\>% select(where(is.factor)) %\>%
-pivot_longer(everything()) %\>% ggplot(aes(x = value)) + geom_bar(fill =
-"steelblue") + facet_wrap(\~ name, scales = "free") + labs(title =
+sklep_rowerowy %>% select(where(is.factor)) %>%
+pivot_longer(everything()) %>% ggplot(aes(x = value)) + geom_bar(fill =
+"steelblue") + facet_wrap(~ name, scales = "free") + labs(title =
 "Rozkład zmiennych kategorycznych", x = "Kategorie", y = "Liczba
-obserwacji") + theme_minimal() #wizualizacja zmiennych kategorycznych \#
-Wizualizacje \# Wykres zakupu rowerów względem regionu
+obserwacji") + theme_minimal() #wizualizacja zmiennych kategorycznych #
+Wizualizacje # Wykres zakupu rowerów względem regionu
 ggplot(sklep_rowerowy, aes(x = Region, fill = Purchased.Bike)) +
 geom_bar(position = "dodge") + labs(title = "Zakup rowerów względem
 regionu", x = "Region", y = "Liczba zakupów", fill = "Zakup roweru (No =
-0, Yes = 1)") + theme_minimal() \# Wykres zakupu rowerów względem
+0, Yes = 1)") + theme_minimal() # Wykres zakupu rowerów względem
 przejechanych kilometrów ggplot(sklep_rowerowy, aes(x =
 Commute.Distance, fill = Purchased.Bike)) + geom_bar(position =
 "dodge") + labs(title = "Zakup rowerów względem przejechanych
@@ -127,20 +127,20 @@ ggplot(sklep_rowerowy, aes(x = `Home.Owner`)) + geom_bar() + labs(title
 
 ## Korelacja zmiennych liczbowych
 
-cor_matrix \<- cor(sklep_rowerowy %\>% select(where(is.numeric)), use =
+cor_matrix <- cor(sklep_rowerowy %>% select(where(is.numeric)), use =
 "complete.obs") ggcorrplot(cor_matrix, hc.order = TRUE, type = "lower",
 lab = TRUE)
 
 ## Model drzewa decyzyjnego
 
-set.seed(123) train_index \<- sample(seq_len(nrow(sklep_rowerowy)), size
-= 0.7 \* nrow(sklep_rowerowy)) train_data \<-
-sklep_rowerowy[train_index, ] test_data \<-
+set.seed(123) train_index <- sample(seq_len(nrow(sklep_rowerowy)), size
+= 0.7 * nrow(sklep_rowerowy)) train_data <-
+sklep_rowerowy[train_index, ] test_data <-
 sklep_rowerowy[-train_index,]
 
 # Budowa drzewa decyzyjnego
 
-tree_model \<- rpart(`Purchased.Bike` \~ ., data = train_data, method =
+tree_model <- rpart(`Purchased.Bike` ~ ., data = train_data, method =
 "class") tree_model \# Wizualizacja drzewa decyzyjnego
 rpart.plot(tree_model, type = 4, extra = 104, fallen.leaves = TRUE,
 box.palette = "RdBu", shadow.col = "gray", nn = TRUE )
