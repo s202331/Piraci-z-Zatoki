@@ -132,7 +132,46 @@ labs(title = "Rozkład zmiennych kategorycznych", x = "Kategorie", y = "Liczba o
 theme_minimal()  #wizualizacja zmiennych kategorycznych
 ```
 
+## Wizualizacje
 
+```{r}
+# Wykres zakupu rowerów względem regionu
+  ggplot(sklep_rowerowy, aes(x = Region, fill = Purchased.Bike)) +
+    geom_bar(position = "dodge") +
+    labs(title = "Zakup rowerów względem regionu",
+         x = "Region",
+         y = "Liczba zakupów",
+         fill = "Zakup roweru (No = 0, Yes = 1)") +
+    theme_minimal()
+# Wykres zakupu rowerów względem przejechanych kilometrów
+ggplot(sklep_rowerowy, aes(x = Commute.Distance, fill = Purchased.Bike)) +
+  geom_bar(position = "dodge") +
+  labs(title = "Zakup rowerów względem przejechanych kilometrów",
+       x = "Dystans dojazdu do pracy",
+       y = "Liczba zakupów",
+       fill = "Zakup roweru (No = 0, Yes = 1)") +
+  theme_minimal()
+
+# Wykres zakupu rowerów względem dochodu
+ggplot(sklep_rowerowy, aes(x = Income, fill = Purchased.Bike)) +
+  geom_histogram(position = "dodge", bins = 30, alpha = 0.7) +
+  labs(title = "Dochód klientów względem zakupu roweru",
+       x = "Dochód",
+       y = "Liczba klientów",
+       fill = "Zakup roweru (No = 0, Yes = 1)") +
+  theme_minimal()
+
+# Wykres pudełkowy pokazujący rozkład dochodów w różnych regionach
+ggplot(sklep_rowerowy, aes(x = Region, y = Income, fill = Region)) +
+  geom_boxplot() +
+  labs(title = "Dochód klientów w różnych regionach",
+       x = "Region",
+       y = "Dochód") +
+  theme_minimal()
+## korelacje zmiennych liczbowych
+cor_matrix <- cor(sklep_rowerowy %>% select(where(is.numeric)), use = "complete.obs")
+ggcorrplot(cor_matrix, hc.order = TRUE, type = "lower", lab = TRUE)
+```
 
 
 
