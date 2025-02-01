@@ -297,6 +297,9 @@ dfSummary(sklep_rowerowy) %>% print(method = "pander", file = "podsumowanie_stat
 ```
 
 # 
-#
-#
-#
+
+# 
+
+# 
+
+# 
