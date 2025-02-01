@@ -188,6 +188,7 @@ ggplot(sklep_rowerowy, aes(x = Region, y = Income, fill = Region)) +
 cor_matrix <- cor(sklep_rowerowy %>% select(where(is.numeric)), use = "complete.obs")
 ggcorrplot(cor_matrix, hc.order = TRUE, type = "lower", lab = TRUE)
 ```
+Najwyższą korelację (0.53) obserwujemy między zmiennymi **Children** i **Income**, co sugeruje, że większa liczba dzieci może wiązać się z wyższymi dochodami. Ta zależność może wynikać z faktu, że rodziny z większą liczbą dzieci mogą potrzebować większych dochodów, aby zapewnić odpowiednie warunki życia. Natomiast zmienna **ID** nie wykazuje istotnej korelacji z żadną inną zmienną, co jest zgodne z oczekiwaniami, ponieważ pełni ona funkcję identyfikatora i nie ma bezpośredniego związku z innymi analizowanymi zmiennymi.
 
 ## Model drzewa decyzyjnego
 
