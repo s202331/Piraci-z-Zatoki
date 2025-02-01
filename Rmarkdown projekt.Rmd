@@ -261,7 +261,39 @@ leveneTest(Income ~ Education, data = sklep_rowerowy)
 by(sklep_rowerowy$Income, sklep_rowerowy$Education, shapiro.test)
 ```
 
+# Test ANOVA dla dochodów w zależności od poziomu wykształcenia
 
+```{r}
+# Przeprowadzamy analizę wariancji (ANOVA) dla dochodów w zależności od poziomu wykształcenia.
+anova_income_education <- aov(Income ~ Education, data = sklep_rowerowy)
+summary(anova_income_education)
+```
+
+# Statystyki opisowe dla zmiennych liczbowych
+
+```{r}
+# Obliczamy podstawowe statystyki opisowe (średnia, mediana, odchylenie standardowe) dla zmiennych liczbowych.
+sklep_rowerowy %>% summarise(across(where(is.numeric), list(
+  mean = ~mean(.x, na.rm = TRUE),
+  median = ~median(.x, na.rm = TRUE),
+  sd = ~sd(.x, na.rm = TRUE)
+)))
+```
+
+# Statystyki opisowe dla zmiennych kategorycznych
+
+```{r}
+# Tworzymy podsumowanie liczebności dla zmiennych kategorycznych.
+sklep_rowerowy %>% summarise(across(where(is.factor), ~list(table(.))))
+```
+
+# Podsumowanie statystyk opisowych
+
+```{r, results='asis'}
+# Tworzymy pełne podsumowanie statystyk opisowych w formacie HTML.
+library(summarytools)
+dfSummary(sklep_rowerowy) %>% print(method = "pander", file = "podsumowanie_statystykiopisowe.html")
+```
 
 
 
