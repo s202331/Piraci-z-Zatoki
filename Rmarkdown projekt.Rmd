@@ -199,7 +199,21 @@ rpart.plot(tree_model,
            cex = 1.1)             # Większa czcionka (domyślnie 1.0)
 ```
 
+# Przewidywanie na zbiorze testowym
 
+```{r}
+# Przewidywanie na zbiorze testowym
+# Wykorzystujemy wcześniej wytrenowany model drzewa decyzyjnego do przewidywania na danych testowych.
+tree_predictions <- predict(tree_model, test_data, type = "class")
+
+# Tworzymy macierz pomyłek, aby ocenić jakość przewidywań modelu.
+conf_matrix <- table(Predicted = tree_predictions, Actual = test_data$`Purchased.Bike`)
+conf_matrix
+
+# Obliczamy dokładność modelu drzewa decyzyjnego, tj. procent poprawnych przewidywań.
+accuracy <- mean(tree_predictions == test_data$`Purchased.Bike`)
+cat("Dokładność modelu drzewa decyzyjnego:", round(accuracy * 100, 2), "%\n")
+```
 
 
 
