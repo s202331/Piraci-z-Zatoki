@@ -42,8 +42,7 @@ mean(is.na(.)) * 100)) %>% pivot_longer(everything(), names_to =
 ggplot(braki_procent, aes(x = reorder(Kolumna, -Procent), y =
 Procent)) + geom_bar(stat = "identity", fill = "steelblue") +
 coord_flip() + labs(title = "Procent brakujących danych w kolumnach", x
-= "Kolumna", y = "% braków") + theme_minimal() # wizualizacja
-procentowa braków w każdej kolumnie
+= "Kolumna", y = "% braków") + theme_minimal() # wizualizacja procentowa braków w każdej kolumnie
 
 vis_miss(sklep_rowerowy, cluster = TRUE) # Klasteryzacja braków dla
 porównania różnych kolumn
@@ -88,14 +87,16 @@ sklep_rowerowy %>% select(where(is.factor)) %>%
 pivot_longer(everything()) %>% ggplot(aes(x = value)) + geom_bar(fill =
 "steelblue") + facet_wrap(~ name, scales = "free") + labs(title =
 "Rozkład zmiennych kategorycznych", x = "Kategorie", y = "Liczba
-obserwacji") + theme_minimal() #wizualizacja zmiennych kategorycznych #
-Wizualizacje # Wykres zakupu rowerów względem regionu
+obserwacji") + theme_minimal() 
+#wizualizacja zmiennych kategorycznych 
+#Wizualizacje # Wykres zakupu rowerów względem regionu
+
 ggplot(sklep_rowerowy, aes(x = Region, fill = Purchased.Bike)) +
 geom_bar(position = "dodge") + labs(title = "Zakup rowerów względem
 regionu", x = "Region", y = "Liczba zakupów", fill = "Zakup roweru (No =
-0, Yes = 1)") + theme_minimal() # Wykres zakupu rowerów względem
-przejechanych kilometrów ggplot(sklep_rowerowy, aes(x =
-Commute.Distance, fill = Purchased.Bike)) + geom_bar(position =
+0, Yes = 1)") + theme_minimal() # Wykres zakupu rowerów względem przejechanych kilometrów 
+
+ggplot(sklep_rowerowy, aes(x =Commute.Distance, fill = Purchased.Bike)) + geom_bar(position =
 "dodge") + labs(title = "Zakup rowerów względem przejechanych
 kilometrów", x = "Dystans dojazdu do pracy", y = "Liczba zakupów", fill
 = "Zakup roweru (No = 0, Yes = 1)") + theme_minimal()
@@ -113,17 +114,7 @@ ggplot(sklep_rowerowy, aes(x = Region, y = Income, fill = Region)) +
 geom_boxplot() + labs(title = "Dochód klientów w różnych regionach", x =
 "Region", y = "Dochód") + theme_minimal()
 
-#Poniższe wykresy przedstawiają rozkłady danych dla wybranych zmiennych
-kategorycznych.
 
-# Marital Status
-
-ggplot(sklep_rowerowy, aes(x = `Marital.Status`)) + geom_bar() +
-labs(title = "Rozkład stanu cywilnego", x = "Stan cywilny", y = "Liczba
-osób") Gender ggplot(sklep_rowerowy, aes(x = `Gender`)) + geom_bar() +
-labs(title = "Rozkład płci", x = "Płeć", y = "Liczba osób") Home Owner
-ggplot(sklep_rowerowy, aes(x = `Home.Owner`)) + geom_bar() + labs(title
-= "Rozkład własności domu", x = "Czy posiada dom", y = "Liczba osób")
 
 ## Korelacja zmiennych liczbowych
 
@@ -133,49 +124,48 @@ lab = TRUE)
 
 ## Model drzewa decyzyjnego
 
-set.seed(123) train_index <- sample(seq_len(nrow(sklep_rowerowy)), size
-= 0.7 * nrow(sklep_rowerowy)) train_data <-
-sklep_rowerowy[train_index, ] test_data <-
-sklep_rowerowy[-train_index,]
+set.seed(123) 
+train_index <- sample(seq_len(nrow(sklep_rowerowy)), size= 0.7 * nrow(sklep_rowerowy)) 
+train_data <-sklep_rowerowy[train_index, ] 
+test_data <- sklep_rowerowy[-train_index,]
 
 # Budowa drzewa decyzyjnego
 
-tree_model <- rpart(`Purchased.Bike` ~ ., data = train_data, method =
-"class") tree_model \# Wizualizacja drzewa decyzyjnego
+tree_model <- rpart(`Purchased.Bike` ~ ., data = train_data, method ="class") tree_model # Wizualizacja drzewa decyzyjnego
 rpart.plot(tree_model, type = 4, extra = 104, fallen.leaves = TRUE,
 box.palette = "RdBu", shadow.col = "gray", nn = TRUE )
 
 # Powiększona wizualizacja drzewa decyzyjnego
 
-rpart.plot(tree_model, type = 4, \# Styl rozwiniętych gałęzi extra =
-104, \# Klasy, procenty, liczebności fallen.leaves = TRUE, \# Liście
-wyrównane do dołu box.palette = "RdBu", \# Kolorowe pudełka shadow.col =
-"gray", \# Cień dla efektu 3D nn = TRUE, \# Numery węzłów cex = 1.1) \#
+rpart.plot(tree_model, type = 4, # Styl rozwiniętych gałęzi extra =
+104, # Klasy, procenty, liczebności fallen.leaves = TRUE, # Liście
+wyrównane do dołu box.palette = "RdBu", # Kolorowe pudełka shadow.col =
+"gray", # Cień dla efektu 3D nn = TRUE, # Numery węzłów cex = 1.1) #
 Większa czcionka (domyślnie 1.0)
 
 # Przewidywanie na zbiorze testowym
 
-tree_predictions \<- predict(tree_model, test_data, type = "class")
+tree_predictions <- predict(tree_model, test_data, type = "class")
 
 # Macierz pomyłek
 
-conf_matrix \<- table(Predicted = tree_predictions, Actual =
-test_data\$`Purchased.Bike`) (conf_matrix)
+conf_matrix <- table(Predicted = tree_predictions, Actual =
+test_data$`Purchased.Bike`) (conf_matrix)
 
 # Obliczenie dokładności modelu
 
-accuracy \<- mean(tree_predictions == test_data\$`Purchased.Bike`) cat("
-Dokładność modelu drzewa decyzyjnego:", round(accuracy \* 100, 2),
-"%\n")
+accuracy <- mean(tree_predictions == test_data\$`Purchased.Bike`) cat("
+Dokładność modelu drzewa decyzyjnego:", round(accuracy * 100, 2),
+"%n")
 
 ## Segmentacja klientów (Klasteryzacja K-średnich)
 
-cluster_data \<- sklep_rowerowy %\>% select(where(is.numeric))
-cluster_data_scaled \<- scale(cluster_data)
+cluster_data <- sklep_rowerowy %>% select(where(is.numeric))
+cluster_data_scaled <- scale(cluster_data)
 
 fviz_nbclust(cluster_data_scaled, kmeans, method = "wss")
 
-set.seed(123) kmeans_model \<- kmeans(cluster_data_scaled, centers = 3,
+set.seed(123) kmeans_model <- kmeans(cluster_data_scaled, centers = 3,
 nstart = 25)
 
 fviz_cluster(kmeans_model, data = cluster_data_scaled, geom = "point") +
@@ -183,12 +173,12 @@ labs(title = "Segmentacja klientów - Klasteryzacja K-średnich")
 
 # Test Kruskala-Wallisa dla dochodu a zakupu roweru
 
-kruskal_test_income_education \<- kruskal.test(Income \~ Education, data
+kruskal_test_income_education <- kruskal.test(Income ~ Education, data
 = sklep_rowerowy) print(kruskal_test_income_education)
 
 # Test jednorodności wariancji (Levene’a)
 
-leveneTest(Income \~ Region, data = sklep_rowerowy)
+leveneTest(Income ~ Region, data = sklep_rowerowy)
 
 # Test Shapiro-Wilka dla każdej grupy poziomu wykształcenia
 
@@ -196,27 +186,27 @@ by(sklep_rowerowy$Income, sklep_rowerowy$Education, shapiro.test)
 
 # Test jednorodności wariancji (Levene’a) dla poziomu wykształcenia
 
-leveneTest(Income \~ Education, data = sklep_rowerowy)
+leveneTest(Income ~ Education, data = sklep_rowerowy)
 
 # Test ANOVA dla dochodów w zależności od poziomu wykształcenia
 
-anova_income_education \<- aov(Income \~ Education, data =
+anova_income_education <- aov(Income ~ Education, data =
 sklep_rowerowy) summary(anova_income_education)
 
 # Statystyki opisowe dla zmiennych liczbowych
 
-sklep_rowerowy %\>% summarise(across(where(is.numeric), list( mean = \~
-mean(.x, na.rm = TRUE), median = \~ median(.x, na.rm = TRUE), sd = \~
+sklep_rowerowy %>% summarise(across(where(is.numeric), list( mean = ~
+mean(.x, na.rm = TRUE), median = ~ median(.x, na.rm = TRUE), sd = ~
 sd(.x, na.rm = TRUE) )))
 
 # Statystyki opisowe dla zmiennych kategorycznych
 
-sklep_rowerowy %\>% summarise(across(where(is.factor), \~
+sklep_rowerowy %>% summarise(across(where(is.factor), ~
 list(table(.))))
 
 # Podsumowanie statystyk opisowych
 
-dfSummary(sklep_rowerowy) %\>% print(method = "pander", file =
+dfSummary(sklep_rowerowy) %>% print(method = "pander", file =
 "podsumowanie_statystykiopisowe.html")
 
-#co dalej up blaganm dziala\> PDW pdw
+
