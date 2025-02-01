@@ -143,7 +143,7 @@ Na wykresach przedstawiono rozkład zmiennych liczbowych w zbiorze danych:
 - **Age**: Zmienna Age wykazuje rozkład prawoskośny, z największą liczbą obserwacji w przedziale 20-40 lat.
 - **Cars**: Zmienna Cars przyjmuje wartości dyskretne, co wskazuje na ograniczoną liczbę unikalnych kategorii.
 - **Children**: Podobnie jak zmienna Cars, zmienna Children przyjmuje wartości dyskretne, również wskazując na ograniczoną liczbę unikalnych kategorii.
-- **Income**: Zmienna Income ma szeroki zakres wartości, z dużą koncentracją obserwacji w niższych przedziałach dochodów.
+- **Income**: Zmienna Income ma szeroki zakres wartości, z dużą koncentracją obserwacji w niższych przedziałach dochodów.Oznacza to, że większość osób w badanej grupie ma niższe dochody, podczas gdy mniejsza liczba osób zarabia znacznie więcej.
 
 ---
 
