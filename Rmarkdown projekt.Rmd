@@ -243,7 +243,23 @@ kruskal_test_income_education <- kruskal.test(Income ~ Education, data = sklep_r
 print(kruskal_test_income_education)
 ```
 
+# Test jednorodności wariancji (Levene’a)
 
+```{r}
+# Testujemy jednorodność wariancji dochodów w różnych regionach.
+library(car)
+leveneTest(Income ~ Region, data = sklep_rowerowy)
+
+# Testujemy jednorodność wariancji dochodów dla poziomu wykształcenia.
+leveneTest(Income ~ Education, data = sklep_rowerowy)
+```
+
+# Test Shapiro-Wilka dla każdej grupy poziomu wykształcenia
+
+```{r}
+# Sprawdzamy normalność rozkładu dochodów w każdej grupie wykształcenia.
+by(sklep_rowerowy$Income, sklep_rowerowy$Education, shapiro.test)
+```
 
 
 
