@@ -215,6 +215,34 @@ accuracy <- mean(tree_predictions == test_data$`Purchased.Bike`)
 cat("Dokładność modelu drzewa decyzyjnego:", round(accuracy * 100, 2), "%\n")
 ```
 
+# Segmentacja klientów (Klasteryzacja K-średnich)
+
+```{r}
+# Przygotowanie danych do klasteryzacji: wybieramy tylko zmienne liczbowe i je standaryzujemy.
+cluster_data <- sklep_rowerowy %>% select(where(is.numeric))
+cluster_data_scaled <- scale(cluster_data)
+
+# Używamy metody WSS, aby znaleźć optymalną liczbę klastrów.
+library(factoextra)
+fviz_nbclust(cluster_data_scaled, kmeans, method = "wss")
+
+# Przeprowadzamy klasteryzację metodą K-średnich z 3 klastrami.
+set.seed(123)
+kmeans_model <- kmeans(cluster_data_scaled, centers = 3, nstart = 25)
+
+# Wizualizacja wyników klasteryzacji.
+fviz_cluster(kmeans_model, data = cluster_data_scaled, geom = "point") +
+  labs(title = "Segmentacja klientów - Klasteryzacja K-średnich")
+```
+
+# Test Kruskala-Wallisa dla dochodu a poziomu wykształcenia
+
+```{r}
+# Testujemy zależność między dochodem a poziomem wykształcenia.
+kruskal_test_income_education <- kruskal.test(Income ~ Education, data = sklep_rowerowy)
+print(kruskal_test_income_education)
+```
+
 
 
 
