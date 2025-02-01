@@ -132,7 +132,11 @@ facet_wrap(~ name, scales = "free") +
 labs(title = "Rozkład zmiennych kategorycznych", x = "Kategorie", y = "Liczba obserwacji") +
 theme_minimal()  #wizualizacja zmiennych kategorycznych
 ```
-
+Rozkład zmiennych kategorycznych:
+- rozkład płci jest dość równomierny między kobietami a mężczyznami
+- większość respondentów jest właścicielami domów
+- większosć osób nie zakupiła roweru
+- najwięcej badanych pokonuje krótki dystans 0-1 mili
 ------------------------------------------------------------------------
 
 ## Analiza Rozkładu Zmiennych Liczbowych
