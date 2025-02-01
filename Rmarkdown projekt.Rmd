@@ -316,6 +316,7 @@ kruskal_income_education <- kruskal.test(Income ~ Education, data = sklep_rowero
 print(kruskal_income_education)
 
 ```
+Test Kruskala-Wallisa to nieparametryczny test statystyczny, który jest używany do porównania median w więcej niż dwóch grupach. Wartość chi-kwadrat wynosi 119,15, co  wskazuje na istotną różnicę między grupami w analizowanej zmiennej - dochodach. Bardzo mała wartość p (< 2.2e-16) sugeruje, że różnice między grupami są statystycznie istotne. Na podstawie tych wyników, hipoteza zerowa, mówiąca o braku różnic w medianach dochodów, zostaje odrzucona, co oznacza, że dochody różnią się w zależności od poziomu wykształcenia.
 
 # Statystyki opisowe dla zmiennych liczbowych
 
