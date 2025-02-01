@@ -173,6 +173,33 @@ cor_matrix <- cor(sklep_rowerowy %>% select(where(is.numeric)), use = "complete.
 ggcorrplot(cor_matrix, hc.order = TRUE, type = "lower", lab = TRUE)
 ```
 
+## Model drzewa decyzyjnego
+
+```{r}
+set.seed(123)
+train_index <- sample(seq_len(nrow(sklep_rowerowy)), size = 0.7 * nrow(sklep_rowerowy))
+train_data <- sklep_rowerowy[train_index, ]
+test_data <- sklep_rowerowy[-train_index, ]
+
+# Budowa drzewa decyzyjnego 
+tree_model <- rpart(`Purchased.Bike` ~ ., data = train_data, method = "class")
+tree_model
+
+# Wizualizacja drzewa decyzyjnego
+rpart.plot(tree_model, type = 4, extra = 104, fallen.leaves = TRUE, 
+           box.palette = "RdBu", shadow.col = "gray", nn = TRUE )
+# Powiększona wizualizacja drzewa decyzyjnego            
+rpart.plot(tree_model, 
+           type = 4,              # Styl rozwiniętych gałęzi
+           extra = 104,           # Klasy, procenty, liczebności
+           fallen.leaves = TRUE,  # Liście wyrównane do dołu
+           box.palette = "RdBu",  # Kolorowe pudełka
+           shadow.col = "gray",   # Cień dla efektu 3D
+           nn = TRUE,             # Numery węzłów
+           cex = 1.1)             # Większa czcionka (domyślnie 1.0)
+```
+
+
 
 
 
