@@ -13,7 +13,7 @@ editor_options:
 ## Wstęp
 
 Klienci sklepu rowerowego wzięli udział w ankiecie, w której dostarczyli
-szczegółowe informacje na swój temat, takie jak: status cywilny, płeć,
+szczegółowych informacji na swój temat, takie jak: status cywilny, płeć,
 poziom dochodów, liczba dzieci, poziom wykształcenia, wykonywany zawód,
 status posiadania domu, liczba samochodów, odległość do miejsca pracy,
 region zamieszkania oraz wiek.
@@ -133,20 +133,26 @@ labs(title = "Rozkład zmiennych kategorycznych", x = "Kategorie", y = "Liczba o
 theme_minimal()  #wizualizacja zmiennych kategorycznych
 ```
 
-
----
+------------------------------------------------------------------------
 
 ## Analiza Rozkładu Zmiennych Liczbowych
 
-Na wykresach przedstawiono rozkład zmiennych liczbowych w zbiorze danych:
+Na wykresach przedstawiono rozkład zmiennych liczbowych w zbiorze
+danych:
 
-- **Age**: Zmienna Age wykazuje rozkład prawoskośny, z największą liczbą obserwacji w przedziale 20-40 lat.
-- **Cars**: Zmienna Cars przyjmuje wartości dyskretne, co wskazuje na ograniczoną liczbę unikalnych kategorii.
-- **Children**: Podobnie jak zmienna Cars, zmienna Children przyjmuje wartości dyskretne, również wskazując na ograniczoną liczbę unikalnych kategorii.
-- **Income**: Zmienna Income ma szeroki zakres wartości, z dużą koncentracją obserwacji w niższych przedziałach dochodów.Oznacza to, że większość osób w badanej grupie ma niższe dochody, podczas gdy mniejsza liczba osób zarabia znacznie więcej.
+-   **Age**: Zmienna Age wykazuje rozkład prawoskośny, z największą
+    liczbą obserwacji w przedziale 20-40 lat.
+-   **Cars**: Zmienna Cars przyjmuje wartości dyskretne, co wskazuje na
+    ograniczoną liczbę unikalnych kategorii.
+-   **Children**: Podobnie jak zmienna Cars, zmienna Children przyjmuje
+    wartości dyskretne, również wskazując na ograniczoną liczbę
+    unikalnych kategorii.
+-   **Income**: Zmienna Income ma szeroki zakres wartości, z dużą
+    koncentracją obserwacji w niższych przedziałach dochodów.Oznacza to,
+    że większość osób w badanej grupie ma niższe dochody, podczas gdy
+    mniejsza liczba osób zarabia znacznie więcej.
 
----
-
+------------------------------------------------------------------------
 
 ## Wizualizacje
 
@@ -188,7 +194,23 @@ ggplot(sklep_rowerowy, aes(x = Region, y = Income, fill = Region)) +
 cor_matrix <- cor(sklep_rowerowy %>% select(where(is.numeric)), use = "complete.obs")
 ggcorrplot(cor_matrix, hc.order = TRUE, type = "lower", lab = TRUE)
 ```
-Najwyższą korelację (0.53) obserwujemy między zmiennymi **Children** i **Income**, co sugeruje, że większa liczba dzieci może wiązać się z wyższymi dochodami. Ta zależność może wynikać z faktu, że rodziny z większą liczbą dzieci mogą potrzebować większych dochodów, aby zapewnić odpowiednie warunki życia. Natomiast zmienna **ID** nie wykazuje istotnej korelacji z żadną inną zmienną, co jest zgodne z oczekiwaniami, ponieważ pełni ona funkcję identyfikatora i nie ma bezpośredniego związku z innymi analizowanymi zmiennymi.
+
+Z wykresu pudełkowego mozna odczytać, że klienci z regionu Pacyfiku mają
+najwyższe dochody, z medianą wyższą niż w pozostałych regionach, oraz
+dużą liczbą wartości odstających. W Ameryce Północnej dochody są nieco
+niższe, ale nadal wyższe niż w Europie, gdzie zaobserowano najniższą
+medianę dochodów i mniejsze zróżnicowanie wartości. Rozrzut dochodów
+jest największy w regionie Pacyfiku, co wskazuje na dużą różnorodność w
+poziomie zarobków klientów.
+
+Najwyższą korelację (0.53) obserwujemy między zmiennymi **Children** i
+**Income**, co sugeruje, że większa liczba dzieci może wiązać się z
+wyższymi dochodami. Ta zależność może wynikać z faktu, że rodziny z
+większą liczbą dzieci mogą potrzebować większych dochodów, aby zapewnić
+odpowiednie warunki życia. Natomiast zmienna **ID** nie wykazuje
+istotnej korelacji z żadną inną zmienną, co jest zgodne z oczekiwaniami,
+ponieważ pełni ona funkcję identyfikatora i nie ma bezpośredniego
+związku z innymi analizowanymi zmiennymi.
 
 ## Model drzewa decyzyjnego
 
