@@ -281,7 +281,7 @@ fviz_cluster(kmeans_model, data = cluster_data_scaled, geom = "point") +
 kruskal_test_income_education <- kruskal.test(Income ~ Education, data = sklep_rowerowy)
 print(kruskal_test_income_education)
 ```
-Test Kruskala-Wallisa został przeprowadzony w celu zbadania różnic w dochodach według poziomu wykształcenia. Wyniki testu wskazują na statystykę chi-kwadrat wynoszącą 119.15 przy 4 stopniach swobody, co sugeruje istotne różnice między grupami. P-wartość < 2.2e-16 jest znacznie mniejsza niż poziom istotności α = 0.05, co pozwala na odrzucenie hipotezy zerowej. Istnieją statystycznie istotne różnice w medianach dochodów w zależności od poziomu wykształcenia.
+Test Kruskala-Wallisa został przeprowadzony w celu zbadania różnic w dochodach według poziomu wykształcenia. Wyniki testu wskazują na statystykę chi-kwadrat wynoszącą 119.15 przy 4 stopniach swobody, co sugeruje istotne różnice między grupami. P-value jest znacznie mniejsza niż poziom istotności α = 0.05, co pozwala na odrzucenie hipotezy zerowej. Istnieją statystycznie istotne różnice w medianach dochodów w zależności od poziomu wykształcenia.
 
 # Test jednorodności wariancji (Levene’a)
 
