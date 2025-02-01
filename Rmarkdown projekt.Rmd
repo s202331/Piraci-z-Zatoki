@@ -293,6 +293,9 @@ leveneTest(Income ~ Region, data = sklep_rowerowy)
 # Testujemy jednorodność wariancji dochodów dla poziomu wykształcenia.
 leveneTest(Income ~ Education, data = sklep_rowerowy)
 ```
+Test Levene’a sprawdzajednorodność wariancji.
+
+Test Levene’a wykazał istotne statystycznie różnice w wariancji dochodów między grupami wykształcenia, co potwierdzają wartości F = 15,435; p = 2,503e-07 (dla 2 grup) oraz F = 2,5284; p = 0,03922 (dla 4 grup). Otrzymane wyniki wskazują na naruszenie założenia homogeniczności wariancji, co sugeruje, że rozkład dochodów nie jest jednorodny w analizowanych grupach. 
 
 # Test Shapiro-Wilka dla każdej grupy poziomu wykształcenia
 
