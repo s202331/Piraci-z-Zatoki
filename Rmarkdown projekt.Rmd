@@ -290,12 +290,15 @@ fviz_cluster(kmeans_model, data = cluster_data_scaled, geom = "point") +
 
 ## Test Shapiro-Wilka dla dochodu a zakupu roweru
 
-Pomaga określić, czy stosować testy parametryczne czy nieparametryczne.
+Pomaga określić, czy stosować testy parametryczne czy nieparametryczne. 
+Hipotezy testowe:
+H₀ (hipoteza zerowa): Dane mają rozkład normalny.
+H₁ (hipoteza alternatywna): Dane nie mają rozkładu normalnego.
 
 ```{r}
 by(sklep_rowerowy$Income, sklep_rowerowy$`Purchased.Bike`, shapiro.test)
 ```
-
+Przy poziomie istotności 95% bardzo niskie wartości p-value (< 0.05) oznaczają, że istnieją statystyczne przesłanki do odrzucenia hipotezy zerowej na rzecz hipotezy alternatywnej, co wskazuje, że dane nie mają rozkładu normalnego.Należy zastosować testy nieprarametryczne.
 ## Test Kruskala-Wallisa dla zakupu roweru a dochodu
 
 ```{r}
