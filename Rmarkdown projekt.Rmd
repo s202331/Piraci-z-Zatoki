@@ -434,5 +434,7 @@ zrozumienie potrzeb klientów, co może przyczynić się do poprawy
 efektywności działań marketingowych i sprzedażowych sklepu rowerowego.
 
 ```{r}
+install.packages(c("rmarkdown", "knitr"))
 rmarkdown::render("Rmarkdown projekt.Rmd", output_format = "html_document")
+
 ```
