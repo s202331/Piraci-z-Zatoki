@@ -21,9 +21,6 @@ region zamieszkania oraz wiek.
 Celem analizy jest określenie, które z tych czynników mają największy
 wpływ na decyzję o zakupie roweru.
 
-------------------------------------------------------------------------
-
-
 W pierwszym etapie projektu przeprowadzono instalajcę oraz załadowanie
 pakietów niezbędnych do analizy danych.
 
@@ -31,7 +28,6 @@ pakietów niezbędnych do analizy danych.
 install.packages(c("readr", "naniar", "dplyr","summarytools", "tidyr","car","psych", 
                    "ggplot2", "mice", "rpart","ggcorrplot","rpart.plot", "gridExtra", 
                    "factoextra", "plyr"))
-install.packages(c("rmarkdown", "knitr"))
 library(readr)
 library(naniar)
 library(plyr)
@@ -53,7 +49,7 @@ read.csv("sklep_rowerowy.csv")
 sklep_rowerowy <- read.csv("sklep_rowerowy.csv")
 ```
 
-# Podstawowa analiza braków
+## Podstawowa analiza braków
 
 ## Identyfikacja braków w danych
 
@@ -83,7 +79,7 @@ ggplot(braki_procent, aes(x = reorder(Kolumna, -Procent), y = Procent)) +
   theme_minimal()
 ```
 
-# Przypisywanie zmiennych typu factor
+## Przypisywanie zmiennych typu factor
 
 W celu poprawności analiz dokonano konwersji wybranych kolumn na zmienne
 kategoryczne (factor), obejmujących m.in. stan cywilny, płeć,
@@ -111,7 +107,7 @@ sklep_rowerowy <- sklep_rowerowy %>%
   )
 ```
 
-# Imputacja Danych
+## Imputacja Danych
 
 W celu uzupełnienia brakujących wartości w zbiorze "sklep_rowerowy"
 zastosowano średnią adaptacyjną do zmiennych liczbowych oraz metodę
@@ -262,7 +258,7 @@ accuracy <- mean(tree_predictions == test_data$`Purchased.Bike`)
 cat("Dokładność modelu drzewa decyzyjnego:", round(accuracy * 100, 2), "%\n")
 ```
 
-# Segmentacja klientów (Klasteryzacja K-średnich) dla osób które kupiły rower ze względu na dane numeryczne
+## Segmentacja klientów (Klasteryzacja K-średnich) dla osób które kupiły rower ze względu na dane numeryczne
 
 Przeprowadzono segmentację klientów, którzy kupili rower, wykorzystując
 metodę K-średnich na podstawie numerycznych cech. Dane zostały
@@ -289,7 +285,7 @@ fviz_cluster(kmeans_model, data = cluster_data_scaled, geom = "point") +
   labs(title = "Segmentacja klientów - Klasteryzacja K-średnich (Kupujący rowery)")
 ```
 
-# Test Shapiro-Wilka dla dochodu a zakupu roweru
+## Test Shapiro-Wilka dla dochodu a zakupu roweru
 
 Pomaga określić, czy stosować testy parametryczne czy nieparametryczne.
 
@@ -297,14 +293,14 @@ Pomaga określić, czy stosować testy parametryczne czy nieparametryczne.
 by(sklep_rowerowy$Income, sklep_rowerowy$`Purchased.Bike`, shapiro.test)
 ```
 
-# Test Kruskala-Wallisa dla zakupu roweru a dochodu
+## Test Kruskala-Wallisa dla zakupu roweru a dochodu
 
 ```{r}
 kruskal_test_income_purchasedbike <- kruskal.test(Income ~ `Purchased.Bike`, data = sklep_rowerowy)
 print(kruskal_test_income_purchasedbike)
 ```
 
-# Powiązanie testów z analizą klientów
+## Powiązanie testów z analizą klientów
 
 ```{r}
 # - Test Shapiro-Wilka: Wyniki testu wykazały, że dochód nie ma rozkładu normalnego zarówno w grupie kupujących, jak i niekupujących roweru (p < 0,05). Wskazuje to, że w dalszej analizie należy stosować testy nieparametryczne (np. Kruskala-Wallisa) zamiast testów parametrycznych (np. ANOVA).
@@ -312,27 +308,27 @@ print(kruskal_test_income_purchasedbike)
 # Dochod nieistotny dupa może region 
 ```
 
-# Test Kruskala- Wallisa dla zakupu roweru a regionu
+## Test Kruskala- Wallisa dla zakupu roweru a regionu
 
 ```{r}
 kruskal_test_Region_purchasedbike <- kruskal.test(Region ~ `Purchased.Bike`, data = sklep_rowerowy)
 print(kruskal_test_Region_purchasedbike)
 ```
 
-# Test Kruskala - Wallisa dla zakupu roweru a dystans do pracy
+## Test Kruskala - Wallisa dla zakupu roweru a dystans do pracy
 
 ```{r}
 kruskal_test_Commute_Distance_purchasedbike <- kruskal.test(`Commute.Distance` ~ `Purchased.Bike`, data = sklep_rowerowy)
 print(kruskal_test_Commute_Distance_purchasedbike)
 ```
 
-# Analiza wyniku testu Kruskala-Wallisa dla dystansu do pracy a zakupu roweru
+## Analiza wyniku testu Kruskala-Wallisa dla dystansu do pracy a zakupu roweru
 
 ```{r}
 # Przeprowadzony test Kruskala-Wallisa wykazał istotne statystycznie różnice w dystansie do pracy między osobami, które kupiły rower, a tymi, które go nie kupiły (p = 0.0067). Oznacza to, że dystans do pracy jest kluczowym czynnikiem wpływającym na decyzję zakupową, co potwierdzają wcześniejsze wizualizacje. Wynik sugeruje, że osoby pokonujące określone odległości częściej decydują się na zakup roweru, dlatego warto skupić się na segmentacji klientów według dystansu i dostosowaniu strategii marketingowych do tej grupy.
 ```
 
-# Statystyki opisowe dla zmiennych liczbowych
+## Statystyki opisowe dla zmiennych liczbowych
 
 W analizowanym zbiorze danych kluczowe zmienne liczbowe obejmują m.in.
 dochód klientów (Income) oraz dystans dojazdu do pracy. Obliczamy
@@ -350,7 +346,7 @@ sklep_rowerowy %>% summarise(across(where(is.numeric), list(
 )))
 ```
 
-# Statystyki opisowe dla zmiennych kategorycznych
+## Statystyki opisowe dla zmiennych kategorycznych
 
 Analizujemy również zmienne kategoryczne, takie jak region zamieszkania
 (Region), poziom wykształcenia (Education) czy czy klient kupił rower
@@ -361,7 +357,7 @@ zidentyfikować dominujące grupy klientów.
 sklep_rowerowy %>% summarise(across(where(is.factor), ~list(table(.))))
 ```
 
-# Podsumowanie statystyk opisowych
+## Podsumowanie statystyk opisowych
 
 1.  Kluczowe statystyki opisowe: Dochód (Income): Średnia wynosi 56
     252,1 z dużym rozrzutem (od 10 000 do 170 000). Wiek (Age): Średnia
@@ -393,7 +389,7 @@ library(summarytools)
 dfSummary(sklep_rowerowy) %>% print(method = "render", style = "grid")
 ```
 
-# Wizualizacja testów
+## Wizualizacja testów
 
 ```{r}
 
@@ -415,7 +411,7 @@ title = "Dochód a = zakup roweru", xlab = "Zakup roweru", ylab = "Dochód", )
 
 ```
 
-# Podsumowanie
+## Podsumowanie
 
 Z przeprowadzonej analizy wynika iż głównymi powodami zakupu rowerów
 jest (Commute.Distance) trasa do pokonania do pracy, oraz wiek i region.
