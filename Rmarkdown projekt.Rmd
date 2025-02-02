@@ -24,7 +24,9 @@ wpływ na decyzję o zakupie roweru.
 W pierwszym etapie projektu przeprowadzono instalajcę oraz załadowanie
 pakietów niezbędnych do analizy danych.
 
-```{r}
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
 install.packages(c("readr", "naniar", "dplyr","summarytools", "tidyr","car","psych", 
                    "ggplot2", "mice", "rpart","ggcorrplot","rpart.plot", "gridExtra", 
                    "factoextra", "plyr"))
@@ -45,33 +47,34 @@ library(car)
 library(psych)
 library(summarytools)
 library(readr)
-setwd("C:/Users/gozia/Desktop/PiracizZatoki")
+
+```
+## Importowanie danych
+```{r}
 read.csv("sklep_rowerowy.csv")
 sklep_rowerowy <- read.csv("sklep_rowerowy.csv")
 ```
-
-## Podstawowa analiza braków
-
+## Podstawowa analiza
+```{r}
+head(sklep_rowerowy)
+str(sklep_rowerowy)
+```
 ## Identyfikacja braków w danych
 
 W celu oceny kompletności zbioru danych „sklep_rowerowy” przeprowadzono
 analizę brakujących wartości. Wyniki wskazują, że w zestawie danych
 znajduje się 31 brakujących wartości. W zbiorze brakuje 0,2% wartości, w
-kolumnach: Income, Children, Cars, Age
+kolumnach: Income, Children, Cars, Age. Sprawdzono również rozłożenie braków w 
+kolumnach w wartościach procentowych.
 
 ```{r}
 n_miss(sklep_rowerowy) 
 vis_miss(sklep_rowerowy) 
 miss_var_summary(sklep_rowerowy) 
-```
 
-## Wizualizacja braków danych
-
-```{r}
 braki_procent <- sklep_rowerowy %>%
   summarise(across(everything(), ~ mean(is.na(.)) * 100)) %>%  
-  pivot_longer(everything(), names_to = "Kolumna", values_to = "Procent")  # Przekształcenie do długiego formatu
-
+  pivot_longer(everything(), names_to = "Kolumna", values_to = "Procent")  
 ggplot(braki_procent, aes(x = reorder(Kolumna, -Procent), y = Procent)) +  
   geom_bar(stat = "identity", fill = "steelblue") +
   coord_flip() +
@@ -79,9 +82,7 @@ ggplot(braki_procent, aes(x = reorder(Kolumna, -Procent), y = Procent)) +
        x = "Kolumna", y = "% braków") +
   theme_minimal()
 ```
-
-Najwięcej braków danych występuje w kolumnie cars. \## Przypisywanie
-zmiennych typu factor
+## Przypisywanie zmiennych typu factor
 
 W celu poprawności analiz dokonano konwersji wybranych kolumn na zmienne
 kategoryczne (factor), obejmujących m.in. stan cywilny, płeć,
@@ -220,7 +221,7 @@ ggcorrplot(cor_matrix, hc.order = TRUE, type = "lower", lab = TRUE)
 
 ## Model drzewa decyzyjnego
 
-1.  Budowa modelu W celu przewidywania zakupu roweru zbudowano model
+1.  **Budowa modelu** W celu przewidywania zakupu roweru zbudowano model
     drzewa decyzyjnego, wykorzystując dane treningowe stanowiące 70%
     zbioru, a pozostałe 30% jako zbiór testowy. Model został wytrenowany
     na podstawie zmiennych niezależnych, a następnie zwizualizowany, co
@@ -299,6 +300,24 @@ H₁ (hipoteza alternatywna): Dane nie mają rozkładu normalnego.
 by(sklep_rowerowy$Income, sklep_rowerowy$`Purchased.Bike`, shapiro.test)
 ```
 Przy poziomie istotności 95% bardzo niskie wartości p-value (< 0.05) oznaczają, że istnieją statystyczne przesłanki do odrzucenia hipotezy zerowej na rzecz hipotezy alternatywnej, co wskazuje, że dane nie mają rozkładu normalnego.Należy zastosować testy nieprarametryczne.
+
+
+## Chi2 dla region a zakup roweru
+Test chi-kwadrat dla zakupu roweru i regionu (p = 0.001032) wykazał istotną zależność, co oznacza, że miejsce zamieszkania wpływa na decyzję o zakupie. Niektóre regiony wykazują większą skłonność do kupowania rowerów niż inne
+
+```{r}
+chi_Region <- chisq.test(table(sklep_rowerowy$`Purchased.Bike`, sklep_rowerowy$Region))
+print(chi_Region)
+```
+## Chi2 dla dystans do pracy a zakup roweru
+Testy chi-kwadrat wykazały istotne zależności między zakupem roweru a regionem (p = 0.001032) oraz dystansem dojazdu (p = 5.852e-07). Oznacza to, że miejsce zamieszkania i odległość do pracy wpływają na decyzję o zakupie roweru – osoby mieszkające bliżej pracy częściej go wybierają.
+
+```{r}
+chi_Distance <- chisq.test(table(sklep_rowerowy$`Purchased.Bike`, sklep_rowerowy$Commute.Distance))
+print(chi_Distance)
+```
+
+
 ## Test Kruskala-Wallisa dla zakupu roweru a dochodu
 
 ```{r}
@@ -308,11 +327,9 @@ kruskal_test_income_purchasedbike
 
 ## Powiązanie testów z analizą klientów
 
-```{r}
-# - Test Shapiro-Wilka: Wyniki testu wykazały, że dochód nie ma rozkładu normalnego zarówno w grupie kupujących, jak i niekupujących roweru (p < 0,05). Wskazuje to, że w dalszej analizie należy stosować testy nieparametryczne (np. Kruskala-Wallisa) zamiast testów parametrycznych (np. ANOVA).
-# - Test Kruskala-Wallisa: Wynik testu (p = 0.1274) wskazuje, że dochód nie różni się istotnie między osobami, które kupiły rower, a tymi, które go nie kupiły. Oznacza to, że dochód nie jest kluczowym czynnikiem decyzyjnym przy zakupie roweru – inne aspekty, takie jak region zamieszkania, dystans do pracy czy styl życia, mogą mieć większe znaczenie.
-# Dochod nieistotny dupa może region 
-```
+### - Test Shapiro-Wilka: Wyniki testu wykazały, że dochód nie ma rozkładu normalnego zarówno w grupie kupujących, jak i niekupujących roweru (p < 0,05). Wskazuje to, że w dalszej analizie należy stosować testy nieparametryczne (np. Kruskala-Wallisa) zamiast testów parametrycznych (np. ANOVA).
+### - Test Kruskala-Wallisa: Wynik testu (p = 0.1274) wskazuje, że dochód nie różni się istotnie między osobami, które kupiły rower, a tymi, które go nie kupiły. Oznacza to, że dochód nie jest kluczowym czynnikiem decyzyjnym przy zakupie roweru – inne aspekty, takie jak region zamieszkania, dystans do pracy czy styl życia, mogą mieć większe znaczenie.
+
 
 ## Test Kruskala- Wallisa dla zakupu roweru a regionu
 
@@ -330,9 +347,8 @@ print(kruskal_test_Commute_Distance_purchasedbike)
 
 ## Analiza wyniku testu Kruskala-Wallisa dla dystansu do pracy a zakupu roweru
 
-```{r}
-# Przeprowadzony test Kruskala-Wallisa wykazał istotne statystycznie różnice w dystansie do pracy między osobami, które kupiły rower, a tymi, które go nie kupiły (p = 0.0067). Oznacza to, że dystans do pracy jest kluczowym czynnikiem wpływającym na decyzję zakupową, co potwierdzają wcześniejsze wizualizacje. Wynik sugeruje, że osoby pokonujące określone odległości częściej decydują się na zakup roweru, dlatego warto skupić się na segmentacji klientów według dystansu i dostosowaniu strategii marketingowych do tej grupy.
-```
+### Przeprowadzony test Kruskala-Wallisa wykazał istotne statystycznie różnice w dystansie do pracy między osobami, które kupiły rower, a tymi, które go nie kupiły (p = 0.0067). Oznacza to, że dystans do pracy jest kluczowym czynnikiem wpływającym na decyzję zakupową, co potwierdzają wcześniejsze wizualizacje. Wynik sugeruje, że osoby pokonujące określone odległości częściej decydują się na zakup roweru, dlatego warto skupić się na segmentacji klientów według dystansu i dostosowaniu strategii marketingowych do tej grupy.
+
 
 ## Statystyki opisowe dla zmiennych liczbowych
 
@@ -361,6 +377,13 @@ zidentyfikować dominujące grupy klientów.
 
 ```{r}
 sklep_rowerowy %>% summarise(across(where(is.factor), ~list(table(.))))
+table(sklep_rowerowy$Marital.Status)
+table(sklep_rowerowy$Gender)
+table(sklep_rowerowy$Education)
+table(sklep_rowerowy$Occupation)
+table(sklep_rowerowy$Home.Owner)
+table(sklep_rowerowy$Commute.Distance)
+table(sklep_rowerowy$Region)
 ```
 
 ## Podsumowanie statystyk opisowych
@@ -395,27 +418,28 @@ library(summarytools)
 dfSummary(sklep_rowerowy) %>% print(method = "render", style = "grid")
 ```
 
-## Wizualizacja testów
-
+## Wizualizacja testóww 
 ```{r}
-
-ggplot(sklep_rowerowy, aes(x = Purchased.Bike, fill = Region)) +
-  geom_bar(position = "dodge") +
-  labs(title = "Zakup roweru a region", x = "Zakup roweru", y = "Liczba kupionych rowerów") +
-  theme_minimal() +
-  scale_x_discrete(labels = c("Nie kupiono", "Kupiono"))
-
-install.packages("ggstatsplot")
+install.packages("ggstatsplot")  
 library(ggstatsplot)
+
+ggbetweenstats( data = sklep_rowerowy, x = Purchased.Bike, y = Region,
+type = "nonparametric",
+title = "Wiek a decyzja o zakupie roweru",
+xlab = "Zakup roweru", ylab = "Wiek", )
+
 
 ggbetweenstats( data = sklep_rowerowy, x = Purchased.Bike,
 y = Income,
 type = "nonparametric",
 title = "Dochód a = zakup roweru", xlab = "Zakup roweru", ylab = "Dochód", )
 
-
-
+ggbetweenstats( data = sklep_rowerowy, x = Purchased.Bike,
+y = Commute.Distance,
+type = "nonparametric",
+title = "Odległość od pracy a  zakup roweru", xlab = "Zakup roweru", ylab = "Odległość od pracy", )
 ```
+
 
 ## Podsumowanie
 
