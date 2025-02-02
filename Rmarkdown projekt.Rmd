@@ -78,7 +78,7 @@ ggplot(braki_procent, aes(x = reorder(Kolumna, -Procent), y = Procent)) +
        x = "Kolumna", y = "% braków") +
   theme_minimal()
 ```
-
+Najwięcej braków danych występuje w kolumnie cars. 
 ## Przypisywanie zmiennych typu factor
 
 W celu poprawności analiz dokonano konwersji wybranych kolumn na zmienne
