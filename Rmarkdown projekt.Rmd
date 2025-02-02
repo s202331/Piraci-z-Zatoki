@@ -55,8 +55,8 @@ sklep_rowerowy <- read.csv("sklep_rowerowy.csv")
 
 W celu oceny kompletności zbioru danych „sklep_rowerowy” przeprowadzono
 analizę brakujących wartości. Wyniki wskazują, że w zestawie danych
-znajduje się 31 brakujących wartości. W zbiorze brakuje 0,4% wartości,
-głównie w kolumnach: - Gender - Cars - Children - Age - Marital Status
+znajduje się 31 brakujących wartości. W zbiorze brakuje 0,2% wartości,
+w kolumnach: Income, Children, Cars, Age
 
 ```{r}
 n_miss(sklep_rowerowy) 
