@@ -23,7 +23,6 @@ wpływ na decyzję o zakupie roweru.
 
 ------------------------------------------------------------------------
 
-## Data Wrangling
 
 W pierwszym etapie projektu przeprowadzono instalajcę oraz załadowanie
 pakietów niezbędnych do analizy danych.
@@ -32,6 +31,7 @@ pakietów niezbędnych do analizy danych.
 install.packages(c("readr", "naniar", "dplyr","summarytools", "tidyr","car","psych", 
                    "ggplot2", "mice", "rpart","ggcorrplot","rpart.plot", "gridExtra", 
                    "factoextra", "plyr"))
+install.packages(c("rmarkdown", "knitr"))
 library(readr)
 library(naniar)
 library(plyr)
@@ -48,6 +48,7 @@ library(car)
 library(psych)
 library(summarytools)
 library(readr)
+setwd("C:/Users/gozia/Desktop/PiracizZatoki")
 read.csv("sklep_rowerowy.csv")
 sklep_rowerowy <- read.csv("sklep_rowerowy.csv")
 ```
@@ -252,20 +253,11 @@ tree_model
 rpart.plot(tree_model, type = 4, extra = 104, fallen.leaves = TRUE, 
            box.palette = "RdBu", shadow.col = "gray", nn = TRUE )
           
-
-### W tej sekcji wykorzystujemy model drzewa decyzyjnego do przewidywania wyników na zbiorze testowym oraz oceniamy jego skuteczność
-
-### Przewidywanie wyników
-## Model jest stosowany do przewidywania wartości zmiennej `Purchased.Bike` na podstawie danych testowych.
 tree_predictions <- predict(tree_model, test_data, type = "class")
 
-### Ocena jakości modelu
-## Aby określić skuteczność modelu, tworzymy macierz pomyłek, która pozwala ocenić liczbę poprawnie i błędnie sklasyfikowanych przypadków.
 conf_matrix <- table(Predicted = tree_predictions, Actual = test_data$`Purchased.Bike`)
 conf_matrix
 
-### Obliczanie dokładności modelu
-## Dokładność modelu obliczamy jako stosunek poprawnych przewidywań do całkowitej liczby obserwacji w zbiorze testowym.
 accuracy <- mean(tree_predictions == test_data$`Purchased.Bike`)
 cat("Dokładność modelu drzewa decyzyjnego:", round(accuracy * 100, 2), "%\n")
 ```
@@ -411,24 +403,40 @@ ggplot(sklep_rowerowy, aes(x = Purchased.Bike, fill = Region)) +
   theme_minimal() +
   scale_x_discrete(labels = c("Nie kupiono", "Kupiono"))
 
+install.packages("ggstatsplot")
+library(ggstatsplot)
+
 ggbetweenstats( data = sklep_rowerowy, x = Purchased.Bike,
 y = Income,
 type = "nonparametric",
 title = "Dochód a = zakup roweru", xlab = "Zakup roweru", ylab = "Dochód", )
 
-group_by(Purchased.Bike) %>%
-  summarise(Commute.Distance = mean(Commute.Distance, na.rm = TRUE))
+
 
 ```
 
-Podsumowanie
+# Podsumowanie
 
-Z przeprowadzonej analizy wynika iż głównymi powodami zakupu rowerów jest (Commute.Distance) trasa do pokonania do pracy, oraz wiek i region.
+Z przeprowadzonej analizy wynika iż głównymi powodami zakupu rowerów
+jest (Commute.Distance) trasa do pokonania do pracy, oraz wiek i region.
 
-Z przeprowadzonych testów Kruskala-Wallisa znaleziono zależność miedzy trasą do pokonania a zakupem roweru, wykazały istotnie statystyczne różnice w dystansie do pracy miedzy osobami ktore kupiły rower a osobami które go nie kupiły.
-Oznacza to że dystans do pracy jest kluczowym czynnikiem wpływającym na zakup roweru.
-Im mniejsza odległość do pracy tym chętniej kupujemy rower.
+Z przeprowadzonych testów Kruskala-Wallisa znaleziono zależność miedzy
+trasą do pokonania a zakupem roweru, wykazały istotnie statystyczne
+różnice w dystansie do pracy miedzy osobami ktore kupiły rower a osobami
+które go nie kupiły. Oznacza to że dystans do pracy jest kluczowym
+czynnikiem wpływającym na zakup roweru. Im mniejsza odległość do pracy
+tym chętniej kupujemy rower.
 
-W ramach analizy statystycznej przeprowadzono również segmentację klientów na podstawie profilu klientów, co pozwoliło zidentyfikować różne grupy konsumentów.
+W ramach analizy statystycznej przeprowadzono również segmentację
+klientów na podstawie profilu klientów, co pozwoliło zidentyfikować
+różne grupy konsumentów.
 
-Podsumowując, wyniki analizy wskazują na dużą koncentrację klientów w określonych grupach wiekowych oraz o dużej zależności miedzy odległością do pracy a zakupem roweru. Przeprowadzone analizy pozwalają na lepsze zrozumienie potrzeb klientów, co może przyczynić się do poprawy efektywności działań marketingowych i sprzedażowych sklepu rowerowego.
+Podsumowując, wyniki analizy wskazują na dużą koncentrację klientów w
+określonych grupach wiekowych oraz o dużej zależności miedzy odległością
+do pracy a zakupem roweru. Przeprowadzone analizy pozwalają na lepsze
+zrozumienie potrzeb klientów, co może przyczynić się do poprawy
+efektywności działań marketingowych i sprzedażowych sklepu rowerowego.
+
+```{r}
+rmarkdown::render("Rmarkdown projekt.Rmd", output_format = "html_document")
+```
