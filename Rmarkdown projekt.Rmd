@@ -13,7 +13,7 @@ editor_options:
 ## Wstęp
 
 Klienci sklepu rowerowego wzięli udział w ankiecie, w której dostarczyli
-szczegółowe informacje na swój temat, takie jak: status cywilny, płeć,
+szczegółowych informacji na swój temat, takich jak: status cywilny, płeć,
 poziom dochodów, liczba dzieci, poziom wykształcenia, wykonywany zawód,
 status posiadania domu, liczba samochodów, odległość do miejsca pracy,
 region zamieszkania oraz wiek.
