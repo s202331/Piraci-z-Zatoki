@@ -159,10 +159,10 @@ vis_miss(sklep_rowerowy) + labs(title = "Braki danych po imputacji")
     najwyższe zarobki występują w regionie Pacyfiku, a najniższe w
     Europie.
 
-4.  Korelacje między zmiennymi Macierz korelacji wykazuje, że najwyższa
-    zależność występuje między liczbą dzieci a dochodem (0,53) oraz
-    liczbą samochodów a dochodem (0,43). Sugeruje to, że dochód jest
-    kluczowym czynnikiem wpływającym na styl życia klientów
+4.  **Korelacje między zmiennymi** - Macierz korelacji wykazuje, że
+    najwyższa zależność występuje między liczbą dzieci a dochodem (0,53)
+    oraz liczbą samochodów a dochodem (0,43). Sugeruje to, że dochód
+    jest kluczowym czynnikiem wpływającym na styl życia klientów
 
 ```{r}
 sklep_rowerowy %>%
