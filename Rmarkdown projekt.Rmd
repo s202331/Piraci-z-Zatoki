@@ -13,10 +13,10 @@ editor_options:
 ## Wstęp
 
 Klienci sklepu rowerowego wzięli udział w ankiecie, w której dostarczyli
-szczegółowych informacji na swój temat, takich jak: status cywilny, płeć,
-poziom dochodów, liczba dzieci, poziom wykształcenia, wykonywany zawód,
-status posiadania domu, liczba samochodów, odległość do miejsca pracy,
-region zamieszkania oraz wiek.
+szczegółowych informacji na swój temat, takich jak: status cywilny,
+płeć, poziom dochodów, liczba dzieci, poziom wykształcenia, wykonywany
+zawód, status posiadania domu, liczba samochodów, odległość do miejsca
+pracy, region zamieszkania oraz wiek.
 
 Celem analizy jest określenie, które z tych czynników mają największy
 wpływ na decyzję o zakupie roweru.
@@ -56,8 +56,8 @@ sklep_rowerowy <- read.csv("sklep_rowerowy.csv")
 
 W celu oceny kompletności zbioru danych „sklep_rowerowy” przeprowadzono
 analizę brakujących wartości. Wyniki wskazują, że w zestawie danych
-znajduje się 31 brakujących wartości. W zbiorze brakuje 0,2% wartości,
-w kolumnach: Income, Children, Cars, Age
+znajduje się 31 brakujących wartości. W zbiorze brakuje 0,2% wartości, w
+kolumnach: Income, Children, Cars, Age
 
 ```{r}
 n_miss(sklep_rowerowy) 
@@ -79,8 +79,9 @@ ggplot(braki_procent, aes(x = reorder(Kolumna, -Procent), y = Procent)) +
        x = "Kolumna", y = "% braków") +
   theme_minimal()
 ```
-Najwięcej braków danych występuje w kolumnie cars. 
-## Przypisywanie zmiennych typu factor
+
+Najwięcej braków danych występuje w kolumnie cars. \## Przypisywanie
+zmiennych typu factor
 
 W celu poprawności analiz dokonano konwersji wybranych kolumn na zmienne
 kategoryczne (factor), obejmujących m.in. stan cywilny, płeć,
@@ -135,7 +136,7 @@ vis_miss(sklep_rowerowy) + labs(title = "Braki danych po imputacji")
 
 ## Wizualizacje
 
-1.  Rozkład zmiennych liczbowych i kategorycznych Przeanalizowano
+1.  **Rozkład zmiennych liczbowych i kategorycznych** - Przeanalizowano
     rozkład zmiennych liczbowych oraz kategorycznych w zbiorze
     "sklep_rowerowy". Histogramy przedstawiają rozkład wartości w
     zmiennych takich jak wiek (Age), liczba samochodów (Cars), liczba
@@ -144,13 +145,14 @@ vis_miss(sklep_rowerowy) + labs(title = "Braki danych po imputacji")
     dla zmiennych takich jak płeć, wykształcenie, region oraz status
     zakupu roweru.
 
-2.  Czynniki wpływające na zakup roweru Dane wskazują na zróżnicowanie
-    decyzji zakupowych w zależności od regionu, gdzie w Ameryce
-    Północnej zakupów jest najwięcej, a w regionie Pacyfiku najmniej.
-    Istotnym czynnikiem jest także dystans do pracy, gdzie osoby
-    mieszkające bliżej (0-1 mil) częściej decydują się na zakup roweru.
+2.  **Czynniki wpływające na zakup roweru** - Dane wskazują na
+    zróżnicowanie decyzji zakupowych w zależności od regionu, gdzie w
+    Ameryce Północnej zakupów jest najwięcej, a w regionie Pacyfiku
+    najmniej. Istotnym czynnikiem jest także dystans do pracy, gdzie
+    osoby mieszkające bliżej miejsca pracy (0-1 mil) częściej decydują
+    się na zakup roweru.
 
-3.  Dochód klientów a zakup roweru Analiza dochodów pokazuje, że
+3.  **Dochód klientów a zakup roweru** - Analiza dochodów pokazuje, że
     większość klientów ma dochody w przedziale 25 000 - 75 000, przy
     czym nie ma wyraźnej różnicy w zakupach rowerów w zależności od
     dochodu. Wykres pudełkowy dochodów w regionach wskazuje, że
