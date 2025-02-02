@@ -47,7 +47,6 @@ library(gridExtra)
 library(car)
 library(psych)
 library(summarytools)
-setwd("C:/Users/tomas/Documents/Piraci-z-Zatoki")
 read.csv("sklep_rowerowy.csv")
 sklep_rowerowy <- read.csv("sklep_rowerowy.csv")
 ```
@@ -298,6 +297,7 @@ fviz_cluster(kmeans_model, data = cluster_data_scaled, geom = "point") +
 ```
 
 # Test Shapiro-Wilka dla dochodu a zakupu roweru
+
 Pomaga określić, czy stosować testy parametryczne czy nieparametryczne.
 
 ```{r}
@@ -369,48 +369,65 @@ sklep_rowerowy %>% summarise(across(where(is.factor), ~list(table(.))))
 ```
 
 # Podsumowanie statystyk opisowych
-1. Kluczowe statystyki opisowe:
-Dochód (Income): Średnia wynosi 56 252,1 z dużym rozrzutem (od 10 000 do 170 000).
-Wiek (Age): Średnia wynosi 44,2, a mediana 43 lata, z minimalnym wiekiem 25 lat i maksymalnym 89 lat.
-Liczba dzieci (Children): Średnia 1.9, przy wartości od 0 do 5.
-Liczba samochodów (Cars): Średnia 1.5, większość osób posiada od 0 do 2 pojazdów.
-2. Struktura demograficzna i społeczna:
-Płeć (Gender): Kobiety i mężczyźni są prawie równomiernie podzieleni (49,4% vs. 50,6%).
-Stan cywilny (Marital Status): 53,8% osób jest w związku małżeńskim, a 46,2% to osoby samotne.
-Wykształcenie (Education): Najwięcej osób ma stopień licencjata (30,6%), a najmniej niepełne wykształcenie średnie (7,6%).
-Status własności nieruchomości (Home Owner): 68,4% klientów posiada własne mieszkanie lub dom.
-3. Charakterystyka transportu:
-Dystans do pracy (Commute Distance): Najwięcej osób dojeżdża 0-1 mili (36,6%), podczas gdy najrzadziej spotykany dystans to 10+ mil (11,1%).
-Region zamieszkania (Region): 30% klientów pochodzi z Europy, 50,8% z Ameryki Północnej, a 19,2% z regionu Pacyfiku.
-4. Decyzja o zakupie roweru:
-51,9% klientów nie kupiło roweru, a 48,1% zdecydowało się na zakup.
-Wnioski:
-Z analizy wynika, że dochody są zróżnicowane, a większość klientów mieszka blisko miejsca pracy. Własność nieruchomości i liczba samochodów mogą wpływać na decyzję o zakupie roweru, natomiast region zamieszkania wydaje się mniej istotny.
+
+1.  Kluczowe statystyki opisowe: Dochód (Income): Średnia wynosi 56
+    252,1 z dużym rozrzutem (od 10 000 do 170 000). Wiek (Age): Średnia
+    wynosi 44,2, a mediana 43 lata, z minimalnym wiekiem 25 lat i
+    maksymalnym 89 lat. Liczba dzieci (Children): Średnia 1.9, przy
+    wartości od 0 do 5. Liczba samochodów (Cars): Średnia 1.5, większość
+    osób posiada od 0 do 2 pojazdów.
+2.  Struktura demograficzna i społeczna: Płeć (Gender): Kobiety i
+    mężczyźni są prawie równomiernie podzieleni (49,4% vs. 50,6%). Stan
+    cywilny (Marital Status): 53,8% osób jest w związku małżeńskim, a
+    46,2% to osoby samotne. Wykształcenie (Education): Najwięcej osób ma
+    stopień licencjata (30,6%), a najmniej niepełne wykształcenie
+    średnie (7,6%). Status własności nieruchomości (Home Owner): 68,4%
+    klientów posiada własne mieszkanie lub dom.
+3.  Charakterystyka transportu: Dystans do pracy (Commute Distance):
+    Najwięcej osób dojeżdża 0-1 mili (36,6%), podczas gdy najrzadziej
+    spotykany dystans to 10+ mil (11,1%). Region zamieszkania (Region):
+    30% klientów pochodzi z Europy, 50,8% z Ameryki Północnej, a 19,2% z
+    regionu Pacyfiku.
+4.  Decyzja o zakupie roweru: 51,9% klientów nie kupiło roweru, a 48,1%
+    zdecydowało się na zakup. Wnioski: Z analizy wynika, że dochody są
+    zróżnicowane, a większość klientów mieszka blisko miejsca pracy.
+    Własność nieruchomości i liczba samochodów mogą wpływać na decyzję o
+    zakupie roweru, natomiast region zamieszkania wydaje się mniej
+    istotny.
 
 ```{r, results='asis'}
 library(summarytools)
 dfSummary(sklep_rowerowy) %>% print(method = "render", style = "grid")
 ```
-# Wizualizacja testów 
+
+# Wizualizacja testów
+
 ```{r}
-install.packages("ggstatsplot")  
-library(ggstatsplot)
 
-ggbetweenstats( data = sklep_rowerowy, x = Purchased.Bike, y = Region,
-type = "nonparametric",
-title = "Wiek a decyzja o zakupie roweru",
-xlab = "Zakup roweru", ylab = "Wiek", )
-
+ggplot(sklep_rowerowy, aes(x = Purchased.Bike, fill = Region)) +
+  geom_bar(position = "dodge") +
+  labs(title = "Zakup roweru a region", x = "Zakup roweru", y = "Liczba kupionych rowerów") +
+  theme_minimal() +
+  scale_x_discrete(labels = c("Nie kupiono", "Kupiono"))
 
 ggbetweenstats( data = sklep_rowerowy, x = Purchased.Bike,
 y = Income,
 type = "nonparametric",
 title = "Dochód a = zakup roweru", xlab = "Zakup roweru", ylab = "Dochód", )
 
-ggbetweenstats( data = sklep_rowerowy, x = Purchased.Bike,
-y = Commute.Distance,
-type = "nonparametric",
-title = "Odległość od pracy a  zakup roweru", xlab = "Zakup roweru", ylab = "Odległość od pracy", )
-str(sklep_rowerowy$Purchased.Bike)
+group_by(Purchased.Bike) %>%
+  summarise(Commute.Distance = mean(Commute.Distance, na.rm = TRUE))
+
 ```
-Podsumowanie111
+
+Podsumowanie
+
+Z przeprowadzonej analizy wynika iż głównymi powodami zakupu rowerów jest (Commute.Distance) trasa do pokonania do pracy, oraz wiek i region.
+
+Z przeprowadzonych testów Kruskala-Wallisa znaleziono zależność miedzy trasą do pokonania a zakupem roweru, wykazały istotnie statystyczne różnice w dystansie do pracy miedzy osobami ktore kupiły rower a osobami które go nie kupiły.
+Oznacza to że dystans do pracy jest kluczowym czynnikiem wpływającym na zakup roweru.
+Im mniejsza odległość do pracy tym chętniej kupujemy rower.
+
+W ramach analizy statystycznej przeprowadzono również segmentację klientów na podstawie profilu klientów, co pozwoliło zidentyfikować różne grupy konsumentów.
+
+Podsumowując, wyniki analizy wskazują na dużą koncentrację klientów w określonych grupach wiekowych oraz o dużej zależności miedzy odległością do pracy a zakupem roweru. Przeprowadzone analizy pozwalają na lepsze zrozumienie potrzeb klientów, co może przyczynić się do poprawy efektywności działań marketingowych i sprzedażowych sklepu rowerowego.
