@@ -297,7 +297,7 @@ by(sklep_rowerowy$Income, sklep_rowerowy$`Purchased.Bike`, shapiro.test)
 
 ```{r}
 kruskal_test_income_purchasedbike <- kruskal.test(Income ~ `Purchased.Bike`, data = sklep_rowerowy)
-print(kruskal_test_income_purchasedbike)
+kruskal_test_income_purchasedbike
 ```
 
 ## Powiązanie testów z analizą klientów
@@ -312,7 +312,7 @@ print(kruskal_test_income_purchasedbike)
 
 ```{r}
 kruskal_test_Region_purchasedbike <- kruskal.test(Region ~ `Purchased.Bike`, data = sklep_rowerowy)
-print(kruskal_test_Region_purchasedbike)
+kruskal_test_Region_purchasedbike
 ```
 
 ## Test Kruskala - Wallisa dla zakupu roweru a dystans do pracy
@@ -435,6 +435,7 @@ efektywności działań marketingowych i sprzedażowych sklepu rowerowego.
 
 ```{r}
 install.packages(c("rmarkdown", "knitr"))
+library(rmarkdown)
+library(knitr)
 rmarkdown::render("Rmarkdown projekt.Rmd", output_format = "html_document")
-
 ```
