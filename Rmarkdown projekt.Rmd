@@ -13,7 +13,7 @@ editor_options:
 ## Wstęp
 
 Klienci sklepu rowerowego wzięli udział w ankiecie, w której dostarczyli
-szczegółowych informacji na swój temat, takie jak: status cywilny, płeć,
+szczegółowe informacje na swój temat, takie jak: status cywilny, płeć,
 poziom dochodów, liczba dzieci, poziom wykształcenia, wykonywany zawód,
 status posiadania domu, liczba samochodów, odległość do miejsca pracy,
 region zamieszkania oraz wiek.
@@ -25,8 +25,10 @@ wpływ na decyzję o zakupie roweru.
 
 ## Data Wrangling
 
+W pierwszym etapie projektu przeprowadzono instalajcę oraz załadowanie
+pakietów niezbędnych do analizy danych.
+
 ```{r}
-# Instalacja i załadowanie wszystkich wymaganych pakietów
 install.packages(c("readr", "naniar", "dplyr","summarytools", "tidyr","car","psych", 
                    "ggplot2", "mice", "rpart","ggcorrplot","rpart.plot", "gridExtra", 
                    "factoextra", "plyr"))
@@ -45,6 +47,7 @@ library(gridExtra)
 library(car)
 library(psych)
 library(summarytools)
+setwd("C:/Users/tomas/Documents/Piraci-z-Zatoki")
 read.csv("sklep_rowerowy.csv")
 sklep_rowerowy <- read.csv("sklep_rowerowy.csv")
 ```
@@ -53,24 +56,25 @@ sklep_rowerowy <- read.csv("sklep_rowerowy.csv")
 
 ## Identyfikacja braków w danych
 
+W celu oceny kompletności zbioru danych „sklep_rowerowy” przeprowadzono
+analizę brakujących wartości. Wyniki wskazują, że w zestawie danych
+znajduje się 31 brakujących wartości. W zbiorze brakuje 0,4% wartości,
+głównie w kolumnach: - Gender - Cars - Children - Age - Marital Status
+
 ```{r}
-n_miss(sklep_rowerowy) # Sprawdzamy ilość NA w pliku
-vis_miss(sklep_rowerowy) # Wizualizacja NA
-miss_var_summary(sklep_rowerowy) # Podsumowanie braków w kolumnach
+n_miss(sklep_rowerowy) 
+vis_miss(sklep_rowerowy) 
+miss_var_summary(sklep_rowerowy) 
 ```
 
 ## Wizualizacja braków danych
 
 ```{r}
-library(dplyr)  
-
-### Obliczenie procentu braków w kolumnach
 braki_procent <- sklep_rowerowy %>%
-  summarise(across(everything(), ~ mean(is.na(.)) * 100)) %>%  # Obliczenie procentu braków
+  summarise(across(everything(), ~ mean(is.na(.)) * 100)) %>%  
   pivot_longer(everything(), names_to = "Kolumna", values_to = "Procent")  # Przekształcenie do długiego formatu
 
-### Wizualizacja braków
-ggplot(braki_procent, aes(x = reorder(Kolumna, -Procent), y = Procent)) +  #Wizualizacja braków 
+ggplot(braki_procent, aes(x = reorder(Kolumna, -Procent), y = Procent)) +  
   geom_bar(stat = "identity", fill = "steelblue") +
   coord_flip() +
   labs(title = "Procent brakujących danych w kolumnach",
@@ -78,10 +82,16 @@ ggplot(braki_procent, aes(x = reorder(Kolumna, -Procent), y = Procent)) +  #Wizu
   theme_minimal()
 ```
 
-# Przetwarzanie braków
-W tej sekcji dokonujemy przetwarzania braków danych poprzez:
-1. **Zamianę pustych wartości na wartości brakujące (`NA`)** w kolumnach `Marital.Status`, `Gender` i `Home.Owner`.
-2. **Konwersję wybranych kolumn na typ `factor`**, co umożliwia ich poprawne traktowanie jako zmiennych kategorycznych.
+# Przypisywanie zmiennych typu factor
+
+W celu poprawności analiz dokonano konwersji wybranych kolumn na zmienne
+kategoryczne (factor), obejmujących m.in. stan cywilny, płeć,
+wykształcenie, zawód, status własności nieruchomości, dystans do pracy,
+region oraz decyzję o zakupie roweru. Przekształcenie to umożliwia
+poprawne traktowanie danych przez R jako nominalne lub porządkowe, co
+jest istotne dla analiz statystycznych, modeli predykcyjnych oraz
+wizualizacji.
+
 ```{r}
 
 sklep_rowerowy <- sklep_rowerowy %>%
@@ -101,18 +111,19 @@ sklep_rowerowy <- sklep_rowerowy %>%
 ```
 
 # Imputacja Danych
-W tej sekcji przeprowadzamy imputację brakujących wartości w zbiorze danych.
-1. **Imputacja zmiennych liczbowych**: 
-   - Brakujące wartości liczbowe zostają zastąpione średnią adaptacyjną (średnia obcięta o 10%).
-2. **Imputacja zmiennych kategorycznych**: 
-   - Wykorzystujemy metodę `Predictive Mean Matching (pmm)` z pakietu `mice`.
+
+W celu uzupełnienia brakujących wartości w zbiorze "sklep_rowerowy"
+zastosowano średnią adaptacyjną do zmiennych liczbowych oraz metodę
+Predictive Mean Matching (pmm) dla zmiennych kategorycznych. Imputacja
+pozwoliła na eliminację braków danych, co zwiększa kompletność i
+wiarygodność zbioru, umożliwiając dokładniejsze analizy. Dzięki tym
+metodom zachowano strukturę danych, minimalizując wpływ braków na wyniki
+statystyczne i modele predykcyjne. Wizualizacja potwierdza, że po
+imputacji wszystkie kolumny są w pełni uzupełnione (0% braków).
 
 ```{r}
-### Imputacja Zmiennych liczbowych - średnia adaptacyjna
 sklep_rowerowy <- sklep_rowerowy %>%
 mutate(across(where(is.numeric), ~ ifelse(is.na(.), mean(., na.rm = TRUE, trim = 0.1), .)))
-
-### Imputacja Zmiennych kategorycznych - metodą `pmm`
 
 imputed_data <- mice(sklep_rowerowy, m = 5, method = 'pmm', seed = 123)
 sklep_rowerowy <- complete(imputed_data)
@@ -121,10 +132,39 @@ sklep_rowerowy
 
 n_miss(sklep_rowerowy)
 
-## Wizualizacja braków danych po imputacji
 vis_miss(sklep_rowerowy) + labs(title = "Braki danych po imputacji")
+```
 
-## Wizualizacja zmiennych liczbowych
+## Wizualizacje
+
+1.  Rozkład zmiennych liczbowych i kategorycznych Przeanalizowano
+    rozkład zmiennych liczbowych oraz kategorycznych w zbiorze
+    "sklep_rowerowy". Histogramy przedstawiają rozkład wartości w
+    zmiennych takich jak wiek (Age), liczba samochodów (Cars), liczba
+    dzieci (Children), dochód (Income), ukazując różnorodność danych i
+    potencjalne odstępstwa. Wykresy kategorii pokazują liczbę obserwacji
+    dla zmiennych takich jak płeć, wykształcenie, region oraz status
+    zakupu roweru.
+
+2.  Czynniki wpływające na zakup roweru Dane wskazują na zróżnicowanie
+    decyzji zakupowych w zależności od regionu, gdzie w Ameryce
+    Północnej zakupów jest najwięcej, a w regionie Pacyfiku najmniej.
+    Istotnym czynnikiem jest także dystans do pracy, gdzie osoby
+    mieszkające bliżej (0-1 mil) częściej decydują się na zakup roweru.
+
+3.  Dochód klientów a zakup roweru Analiza dochodów pokazuje, że
+    większość klientów ma dochody w przedziale 25 000 - 75 000, przy
+    czym nie ma wyraźnej różnicy w zakupach rowerów w zależności od
+    dochodu. Wykres pudełkowy dochodów w regionach wskazuje, że
+    najwyższe zarobki występują w regionie Pacyfiku, a najniższe w
+    Europie.
+
+4.  Korelacje między zmiennymi Macierz korelacji wykazuje, że najwyższa
+    zależność występuje między liczbą dzieci a dochodem (0,53) oraz
+    liczbą samochodów a dochodem (0,43). Sugeruje to, że dochód jest
+    kluczowym czynnikiem wpływającym na styl życia klientów
+
+```{r}
 sklep_rowerowy %>%
 select(where(is.numeric)) %>%
 pivot_longer(everything()) %>%
@@ -134,7 +174,6 @@ facet_wrap(~ name, scales = "free") +
 labs(title = "Rozkład zmiennych liczbowych", x = "Wartość", y = "Częstość") +
 theme_minimal()   
 
-## Wizualizacja zmiennych kategorycznych
 sklep_rowerowy %>%
 select(where(is.factor)) %>%
 pivot_longer(everything()) %>%
@@ -143,37 +182,7 @@ geom_bar(fill = "steelblue") +
 facet_wrap(~ name, scales = "free") +
 labs(title = "Rozkład zmiennych kategorycznych", x = "Kategorie", y = "Liczba obserwacji") +
 theme_minimal()  
-```
-Rozkład zmiennych kategorycznych:
-- rozkład płci jest dość równomierny między kobietami a mężczyznami
-- większość respondentów jest właścicielami domów
-- większosć osób nie zakupiła roweru
-- najwięcej badanych pokonuje krótki dystans do pracy 0-1 mili
-------------------------------------------------------------------------
 
-## Analiza Rozkładu Zmiennych Liczbowych
-
-Na wykresach przedstawiono rozkład zmiennych liczbowych w zbiorze
-danych:
-
--   **Age**: Zmienna Age wykazuje rozkład prawoskośny, z największą
-    liczbą obserwacji w przedziale 20-40 lat.
--   **Cars**: Zmienna Cars przyjmuje wartości dyskretne, co wskazuje na
-    ograniczoną liczbę unikalnych kategorii.
--   **Children**: Podobnie jak zmienna Cars, zmienna Children przyjmuje
-    wartości dyskretne, również wskazując na ograniczoną liczbę
-    unikalnych kategorii.
--   **Income**: Zmienna Income ma szeroki zakres wartości, z dużą
-    koncentracją obserwacji w niższych przedziałach dochodów.Oznacza to,
-    że większość osób w badanej grupie ma niższe dochody, podczas gdy
-    mniejsza liczba osób zarabia znacznie więcej.
-
-------------------------------------------------------------------------
-
-## Wizualizacje
-W tej sekcji przedstawiamy różne wykresy wizualizujące dane:
-```{r}
-# Wykres zakupu rowerów względem regionu
   ggplot(sklep_rowerowy, aes(x = Region, fill = Purchased.Bike)) +
     geom_bar(position = "dodge") +
     labs(title = "Zakup rowerów względem regionu",
@@ -181,7 +190,7 @@ W tej sekcji przedstawiamy różne wykresy wizualizujące dane:
          y = "Liczba zakupów",
          fill = "Zakup roweru (No = 0, Yes = 1)") +
     theme_minimal()
-# Wykres zakupu rowerów względem przejechanych kilometrów
+  
 ggplot(sklep_rowerowy, aes(x = Commute.Distance, fill = Purchased.Bike)) +
   geom_bar(position = "dodge") +
   labs(title = "Zakup rowerów względem przejechanych kilometrów",
@@ -190,7 +199,6 @@ ggplot(sklep_rowerowy, aes(x = Commute.Distance, fill = Purchased.Bike)) +
        fill = "Zakup roweru (No = 0, Yes = 1)") +
   theme_minimal()
 
-# Wykres zakupu rowerów względem dochodu
 ggplot(sklep_rowerowy, aes(x = Income, fill = Purchased.Bike)) +
   geom_histogram(position = "dodge", bins = 30, alpha = 0.7) +
   labs(title = "Dochód klientów względem zakupu roweru",
@@ -199,64 +207,52 @@ ggplot(sklep_rowerowy, aes(x = Income, fill = Purchased.Bike)) +
        fill = "Zakup roweru (No = 0, Yes = 1)") +
   theme_minimal()
 
-# Wykres pudełkowy pokazujący rozkład dochodów w różnych regionach
 ggplot(sklep_rowerowy, aes(x = Region, y = Income, fill = Region)) +
   geom_boxplot() +
   labs(title = "Dochód klientów w różnych regionach",
        x = "Region",
        y = "Dochód") +
   theme_minimal()
-## korelacje zmiennych liczbowych
+
 cor_matrix <- cor(sklep_rowerowy %>% select(where(is.numeric)), use = "complete.obs")
 ggcorrplot(cor_matrix, hc.order = TRUE, type = "lower", lab = TRUE)
 ```
-Największa liczba zakupów rowerów występuje w przypadku osób pokonujących krótkie dystanse (0-1 mili) do pracy, co sugeruje, że im krótszy dystans do pracy, tym większa skłonność do zakupu roweru. # czy umiecie zrobic tak żeby 10+ miles było na końcu wykresu, nie w środku, bo kategorie na osi poziomej rosna nie tak jak powinny, ja cos probowałam ale nie wyszło mi to przestawianie
-
-Z wykresu pudełkowego mozna odczytać, że klienci z regionu Pacyfiku mają
-najwyższe dochody, z medianą wyższą niż w pozostałych regionach, oraz
-dużą liczbą wartości odstających. W Ameryce Północnej dochody są nieco
-niższe, ale nadal wyższe niż w Europie, gdzie zaobserowano najniższą
-medianę dochodów i mniejsze zróżnicowanie wartości. Rozrzut dochodów
-jest największy w regionie Pacyfiku, co wskazuje na dużą różnorodność w
-poziomie zarobków klientów.
-
-Najwyższą korelację (0.53) obserwujemy między zmiennymi **Children** i
-**Income**, co sugeruje, że większa liczba dzieci może wiązać się z
-wyższymi dochodami. Ta zależność może wynikać z faktu, że rodziny z
-większą liczbą dzieci mogą potrzebować większych dochodów, aby zapewnić
-odpowiednie warunki życia. Natomiast zmienna **ID** nie wykazuje
-istotnej korelacji z żadną inną zmienną, co jest zgodne z oczekiwaniami,
-ponieważ pełni ona funkcję identyfikatora i nie ma bezpośredniego
-związku z innymi analizowanymi zmiennymi.
 
 ## Model drzewa decyzyjnego
-W tej sekcji budujemy model drzewa decyzyjnego do przewidywania zakupu roweru na podstawie dostępnych danych
+
+1.  Budowa modelu W celu przewidywania zakupu roweru zbudowano model
+    drzewa decyzyjnego, wykorzystując dane treningowe stanowiące 70%
+    zbioru, a pozostałe 30% jako zbiór testowy. Model został wytrenowany
+    na podstawie zmiennych niezależnych, a następnie zwizualizowany, co
+    umożliwia interpretację kluczowych czynników wpływających na zakup
+    roweru.
+
+2.  Wyniki predykcji Macierz pomyłek pokazuje, że model poprawnie
+    sklasyfikował 98 przypadków braku zakupu oraz 77 przypadków zakupu,
+    jednak 71 osób, które nie kupiły roweru, zostało błędnie
+    zaklasyfikowanych jako kupujący, a 54 osoby, które dokonały zakupu,
+    zostały zaklasyfikowane jako niekupujący.
+
+3.  Dokładność modelu Uzyskana dokładność modelu wynosi 58,33%, co
+    sugeruje umiarkowaną skuteczność klasyfikacji. Wynik ten może
+    wskazywać na potrzebę optymalizacji modelu, np. poprzez pruning
+    drzewa, zastosowanie innych metod klasyfikacyjnych lub inżynierię
+    cech w celu zwiększenia jego predykcyjnej wartości.
+
 ```{r}
 set.seed(123)
 train_index <- sample(seq_len(nrow(sklep_rowerowy)), size = 0.7 * nrow(sklep_rowerowy))
 train_data <- sklep_rowerowy[train_index, ]
 test_data <- sklep_rowerowy[-train_index, ]
 
-# Budowa drzewa decyzyjnego 
 tree_model <- rpart(`Purchased.Bike` ~ ., data = train_data, method = "class")
 tree_model
 
-# Wizualizacja drzewa decyzyjnego
+
 rpart.plot(tree_model, type = 4, extra = 104, fallen.leaves = TRUE, 
            box.palette = "RdBu", shadow.col = "gray", nn = TRUE )
-# Powiększona wizualizacja drzewa decyzyjnego            
-rpart.plot(tree_model, 
-           type = 4,              # Styl rozwiniętych gałęzi
-           extra = 104,           # Klasy, procenty, liczebności
-           fallen.leaves = TRUE,  # Liście wyrównane do dołu
-           box.palette = "RdBu",  # Kolorowe pudełka
-           shadow.col = "gray",   # Cień dla efektu 3D
-           nn = TRUE,             # Numery węzłów
-           cex = 1.1)             # Większa czcionka (domyślnie 1.0)
-```
+          
 
-# Przewidywanie na zbiorze testowym
-```{r}
 ### W tej sekcji wykorzystujemy model drzewa decyzyjnego do przewidywania wyników na zbiorze testowym oraz oceniamy jego skuteczność
 
 ### Przewidywanie wyników
@@ -274,119 +270,85 @@ accuracy <- mean(tree_predictions == test_data$`Purchased.Bike`)
 cat("Dokładność modelu drzewa decyzyjnego:", round(accuracy * 100, 2), "%\n")
 ```
 
-Model drzewa decyzyjnego poprawnie przewidział **98 przypadków "No"** i
-**77 przypadków "Yes"**, ale popełnił **71 błędów fałszywie
-negatywnych** i **54 fałszywie pozytywne**. Jego dokładność wynosi
-**58,33%**, co oznacza, że klasyfikuje poprawnie nieco ponad połowę
-przypadków. Wynik wskazuje na umiarkowaną skuteczność, sugerując
-potrzebę dalszej optymalizacji modelu. \# Segmentacja klientów
-(Klasteryzacja K-średnich)
+# Segmentacja klientów (Klasteryzacja K-średnich) dla osób które kupiły rower ze względu na dane numeryczne
+
+Przeprowadzono segmentację klientów, którzy kupili rower, wykorzystując
+metodę K-średnich na podstawie numerycznych cech. Dane zostały
+standaryzowane, a optymalną liczbę klastrów określono metodą WSS (Elbow
+Method). Klasteryzacja podzieliła klientów na trzy grupy, co
+wizualizacja przedstawia jako odrębne segmenty. Analiza ta pozwala
+lepiej zrozumieć różnice między kupującymi oraz identyfikować ich
+charakterystyczne cechy, co może być użyteczne w strategiach
+marketingowych i sprzedażowych.
 
 ```{r}
-### W tej sekcji przeprowadzamy segmentację klientów metodą klasteryzacji K-średnich. Klasteryzacja pozwala na grupowanie klientów o podobnych cechach, co może być użyteczne w strategiach marketingowych i personalizacji oferty.
 
-###Przygotowanie danych do klasteryzacji: wybieramy tylko zmienne liczbowe i je standaryzujemy.
-## Aby zapewnić poprawność analizy:
-#- Wybieramy tylko zmienne liczbowe.
-#- Standaryzujemy dane, aby wszystkie zmienne miały porównywalną skalę.
-cluster_data <- sklep_rowerowy %>% select(where(is.numeric))
+bike_buyers <- sklep_rowerowy %>% filter(Purchased.Bike == "Yes")
+
+cluster_data <- bike_buyers %>% select(where(is.numeric))
 cluster_data_scaled <- scale(cluster_data)
 
-### Wybór optymalnej liczby klastrów
-## Używamy metody WSS (within-cluster sum of squares), aby określić optymalną liczbę klastrów. Punkt załamania na wykresie wskazuje najlepszą liczbę grup.
-library(factoextra)
 fviz_nbclust(cluster_data_scaled, kmeans, method = "wss")
 
-# Przeprowadzamy klasteryzację metodą K-średnich z 3 klastrami.
 set.seed(123)
 kmeans_model <- kmeans(cluster_data_scaled, centers = 3, nstart = 25)
 
-# Wizualizacja wyników klasteryzacji.
 fviz_cluster(kmeans_model, data = cluster_data_scaled, geom = "point") +
-  labs(title = "Segmentacja klientów - Klasteryzacja K-średnich")
+  labs(title = "Segmentacja klientów - Klasteryzacja K-średnich (Kupujący rowery)")
 ```
 
-# Test Kruskala-Wallisa dla dochodu a poziomu wykształcenia
+# Test Shapiro-Wilka dla dochodu a zakupu roweru
+Pomaga określić, czy stosować testy parametryczne czy nieparametryczne.
 
 ```{r}
-# Test sprawdza, czy istnieją istotne różnice w medianach dochodu między grupami edukacyjnymi. Pomaga to ocenić wpływ wykształcenia na dochód, co może mieć znaczenie w strategiach marketingowych.
-kruskal_test_income_education <- kruskal.test(Income ~ Education, data = sklep_rowerowy)
-print(kruskal_test_income_education)
+by(sklep_rowerowy$Income, sklep_rowerowy$`Purchased.Bike`, shapiro.test)
 ```
 
-Test Kruskala-Wallisa został przeprowadzony w celu zbadania różnic w
-dochodach według poziomu wykształcenia. Wyniki testu wskazują na
-statystykę chi-kwadrat wynoszącą 119.15 przy 4 stopniach swobody, co
-sugeruje istotne różnice między grupami. P-value jest znacznie mniejsza
-niż poziom istotności α = 0.05, co pozwala na odrzucenie hipotezy
-zerowej. Istnieją statystycznie istotne różnice w medianach dochodów w
-zależności od poziomu wykształcenia.
-
-# Test jednorodności wariancji (Levene’a)
+# Test Kruskala-Wallisa dla zakupu roweru a dochodu
 
 ```{r}
-# Test Levene’a sprawdza, czy dochody w różnych regionach i poziomach wykształcenia mają podobną wariancję. Jest to istotne w analizie segmentacji klientów i klasteryzacji.
-library(car)
-leveneTest(Income ~ Region, data = sklep_rowerowy)
-
-leveneTest(Income ~ Education, data = sklep_rowerowy)
+kruskal_test_income_purchasedbike <- kruskal.test(Income ~ `Purchased.Bike`, data = sklep_rowerowy)
+print(kruskal_test_income_purchasedbike)
 ```
 
-Test Levene’a (sprawdzenie jednorodność wariancji)
-
-Test Levene’a wykazał istotne statystycznie różnice w wariancji dochodów
-między grupami wykształcenia, co potwierdzają wartości F = 15,435; p =
-2,503e-07 (dla 2 grup) oraz F = 2,5284; p = 0,03922 (dla 4 grup).
-Otrzymane wyniki wskazują na naruszenie założenia homogeniczności
-wariancji, co sugeruje, że rozkład dochodów nie jest jednorodny w
-analizowanych grupach.
-
-# Test Shapiro-Wilka dla każdej grupy poziomu wykształcenia
-
-```{r}
-# Test ocenia normalność rozkładu dochodów w grupach edukacyjnych. Pomaga określić, czy stosować testy parametryczne czy nieparametryczne.
-by(sklep_rowerowy$Income, sklep_rowerowy$Education, shapiro.test)
-```
-Dla wszystkich pięciu poziomów wykształcenia wyniki testu Shapiro-Wilka wskazują na brak normalności rozkładów dochodów, ponieważ w każdym przypadku wartość p jest mniejsza niż 0.05.
-Brak normalności danych w każdej z grup oznacza, że założenie o normalnym rozkładzie danych, wymagane w testach parametrycznych takich jak ANOVA, jest naruszone. W takim przypadku nie należy stosować testu ANOVA, ponieważ może to prowadzić do błędnych wniosków. Zamiast tego, do analizy użyto testu nieparametrycznego Kruskala-Wallisa, który nie wymaga założenia normalności rozkładu.
-# Test ANOVA dla dochodów w zależności od poziomu wykształcenia \_ usunęłam test ANOVA, bo nie mamy spełnionego założenia o noemalności, dlatego zrobiłam inny test, tym razem nieparametryczny kruskala-willisa
-
-# Przeprowadzamy test Kruskal-Wallisa dla dochodów w zależności od poziomu wykształcenia
-
-```{r}
-# Przeprowadzenie testu Kruskal-Wallisa
-kruskal_income_education <- kruskal.test(Income ~ Education, data = sklep_rowerowy)
-
-# Wyświetlenie wyników testu
-print(kruskal_income_education)
-
-```
-
-<<<<<<< HEAD
 # Powiązanie testów z analizą klientów
+
 ```{r}
-# - Test Kruskala-Wallisa**: Ocena różnic dochodów między grupami edukacyjnymi.
-# - Test Levene’a**: Sprawdzenie jednorodności wariancji, istotne dla segmentacji klientów.
-# - Test Shapiro-Wilka**: Weryfikacja założeń statystycznych dla dalszej analizy.
+# - Test Shapiro-Wilka: Wyniki testu wykazały, że dochód nie ma rozkładu normalnego zarówno w grupie kupujących, jak i niekupujących roweru (p < 0,05). Wskazuje to, że w dalszej analizie należy stosować testy nieparametryczne (np. Kruskala-Wallisa) zamiast testów parametrycznych (np. ANOVA).
+# - Test Kruskala-Wallisa: Wynik testu (p = 0.1274) wskazuje, że dochód nie różni się istotnie między osobami, które kupiły rower, a tymi, które go nie kupiły. Oznacza to, że dochód nie jest kluczowym czynnikiem decyzyjnym przy zakupie roweru – inne aspekty, takie jak region zamieszkania, dystans do pracy czy styl życia, mogą mieć większe znaczenie.
+# Dochod nieistotny dupa może region 
 ```
-=======
-Test Kruskala-Wallisa to nieparametryczny test statystyczny, który jest
-używany do porównania median w więcej niż dwóch grupach. Wartość
-chi-kwadrat wynosi 119,15, co wskazuje na istotną różnicę między grupami
-w analizowanej zmiennej - dochodach. Bardzo mała wartość p (\< 2.2e-16)
-sugeruje, że różnice między grupami są statystycznie istotne. Na
-podstawie tych wyników, hipoteza zerowa, mówiąca o braku różnic w
-medianach dochodów, zostaje odrzucona, co oznacza, że dochody różnią się
-w zależności od poziomu wykształcenia.
->>>>>>> cf7b3fab27c317260d8d33353ceac2d8352bb17b
+
+# Test Kruskala- Wallisa dla zakupu roweru a regionu
+
+```{r}
+kruskal_test_Region_purchasedbike <- kruskal.test(Region ~ `Purchased.Bike`, data = sklep_rowerowy)
+print(kruskal_test_Region_purchasedbike)
+```
+
+# Test Kruskala - Wallisa dla zakupu roweru a dystans do pracy
+
+```{r}
+kruskal_test_Commute_Distance_purchasedbike <- kruskal.test(`Commute.Distance` ~ `Purchased.Bike`, data = sklep_rowerowy)
+print(kruskal_test_Commute_Distance_purchasedbike)
+```
+
+# Analiza wyniku testu Kruskala-Wallisa dla dystansu do pracy a zakupu roweru
+
+```{r}
+# Przeprowadzony test Kruskala-Wallisa wykazał istotne statystycznie różnice w dystansie do pracy między osobami, które kupiły rower, a tymi, które go nie kupiły (p = 0.0067). Oznacza to, że dystans do pracy jest kluczowym czynnikiem wpływającym na decyzję zakupową, co potwierdzają wcześniejsze wizualizacje. Wynik sugeruje, że osoby pokonujące określone odległości częściej decydują się na zakup roweru, dlatego warto skupić się na segmentacji klientów według dystansu i dostosowaniu strategii marketingowych do tej grupy.
+```
 
 # Statystyki opisowe dla zmiennych liczbowych
 
+W analizowanym zbiorze danych kluczowe zmienne liczbowe obejmują m.in.
+dochód klientów (Income) oraz dystans dojazdu do pracy. Obliczamy
+podstawowe statystyki, takie jak: - Średnia arytmetyczna (mean) –
+określa przeciętną wartość danej cechy, - Mediana (median) – wartość
+środkowa, mniej podatna na wartości odstające, - Odchylenie standardowe
+(sd) – określa zmienność w ramach danej zmiennej
+
 ```{r}
-# W analizowanym zbiorze danych kluczowe zmienne liczbowe obejmują m.in. **dochód klientów (Income)** oraz **dystans dojazdu do pracy (Commute.Distance)**. Obliczamy podstawowe statystyki, takie jak:
-## - **Średnia arytmetyczna (mean)** – określa przeciętną wartość danej cechy,
-## - **Mediana (median)** – wartość środkowa, mniej podatna na wartości odstające,
-## - **Odchylenie standardowe (sd)** – określa zmienność w ramach danej zmiennej
 
 sklep_rowerowy %>% summarise(across(where(is.numeric), list(
   mean = ~mean(.x, na.rm = TRUE),
@@ -396,30 +358,59 @@ sklep_rowerowy %>% summarise(across(where(is.numeric), list(
 ```
 
 # Statystyki opisowe dla zmiennych kategorycznych
-# Analizujemy również zmienne kategoryczne, takie jak **region zamieszkania (Region)**, **poziom wykształcenia (Education)** czy **czy klient kupił rower (Purchased.Bike)**. Dla tych zmiennych tworzymy tabelę liczebności, aby zidentyfikować dominujące grupy klientów.
-```{r}.
+
+Analizujemy również zmienne kategoryczne, takie jak region zamieszkania
+(Region), poziom wykształcenia (Education) czy czy klient kupił rower
+(Purchased.Bike). Dla tych zmiennych tworzymy tabelę liczebności, aby
+zidentyfikować dominujące grupy klientów.
+
+```{r}
 sklep_rowerowy %>% summarise(across(where(is.factor), ~list(table(.))))
 ```
 
 # Podsumowanie statystyk opisowych
+1. Kluczowe statystyki opisowe:
+Dochód (Income): Średnia wynosi 56 252,1 z dużym rozrzutem (od 10 000 do 170 000).
+Wiek (Age): Średnia wynosi 44,2, a mediana 43 lata, z minimalnym wiekiem 25 lat i maksymalnym 89 lat.
+Liczba dzieci (Children): Średnia 1.9, przy wartości od 0 do 5.
+Liczba samochodów (Cars): Średnia 1.5, większość osób posiada od 0 do 2 pojazdów.
+2. Struktura demograficzna i społeczna:
+Płeć (Gender): Kobiety i mężczyźni są prawie równomiernie podzieleni (49,4% vs. 50,6%).
+Stan cywilny (Marital Status): 53,8% osób jest w związku małżeńskim, a 46,2% to osoby samotne.
+Wykształcenie (Education): Najwięcej osób ma stopień licencjata (30,6%), a najmniej niepełne wykształcenie średnie (7,6%).
+Status własności nieruchomości (Home Owner): 68,4% klientów posiada własne mieszkanie lub dom.
+3. Charakterystyka transportu:
+Dystans do pracy (Commute Distance): Najwięcej osób dojeżdża 0-1 mili (36,6%), podczas gdy najrzadziej spotykany dystans to 10+ mil (11,1%).
+Region zamieszkania (Region): 30% klientów pochodzi z Europy, 50,8% z Ameryki Północnej, a 19,2% z regionu Pacyfiku.
+4. Decyzja o zakupie roweru:
+51,9% klientów nie kupiło roweru, a 48,1% zdecydowało się na zakup.
+Wnioski:
+Z analizy wynika, że dochody są zróżnicowane, a większość klientów mieszka blisko miejsca pracy. Własność nieruchomości i liczba samochodów mogą wpływać na decyzję o zakupie roweru, natomiast region zamieszkania wydaje się mniej istotny.
 
 ```{r, results='asis'}
-# Aby uzyskać pełny wgląd w dane, generujemy szczegółowy raport zawierający statystyki opisowe wszystkich zmiennych, który możemy zapisać w formacie HTML. Dzięki temu łatwo możemy analizować zmienność dochodów, dominujące grupy klientów oraz potencjalne braki w danych..
 library(summarytools)
-dfSummary(sklep_rowerowy) %>% print(method = "pander", file = "podsumowanie_statystykiopisowe.html")
+dfSummary(sklep_rowerowy) %>% print(method = "render", style = "grid")
 ```
-a
-# 
-#asda 
-# 
+# Wizualizacja testów 
+```{r}
+install.packages("ggstatsplot")  
+library(ggstatsplot)
 
-# #
-#
+ggbetweenstats( data = sklep_rowerowy, x = Purchased.Bike, y = Region,
+type = "nonparametric",
+title = "Wiek a decyzja o zakupie roweru",
+xlab = "Zakup roweru", ylab = "Wiek", )
 
-# Test kruskala widzę że mamy w 2 miejscch w anova i w test kruskala to bedzie trzeba wybrac gdzie go wstawić
 
-# 
+ggbetweenstats( data = sklep_rowerowy, x = Purchased.Bike,
+y = Income,
+type = "nonparametric",
+title = "Dochód a = zakup roweru", xlab = "Zakup roweru", ylab = "Dochód", )
 
-# 
-
-# 
+ggbetweenstats( data = sklep_rowerowy, x = Purchased.Bike,
+y = Commute.Distance,
+type = "nonparametric",
+title = "Odległość od pracy a  zakup roweru", xlab = "Zakup roweru", ylab = "Odległość od pracy", )
+str(sklep_rowerowy$Purchased.Bike)
+```
+Podsumowanie111
