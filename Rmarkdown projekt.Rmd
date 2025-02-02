@@ -228,12 +228,12 @@ ggcorrplot(cor_matrix, hc.order = TRUE, type = "lower", lab = TRUE)
     roweru.
 
 2.  Wyniki predykcji Macierz pomyłek pokazuje, że model poprawnie
-    sklasyfikował 98 przypadków braku zakupu oraz 77 przypadków zakupu,
+    sklasyfikował 102 przypadki braku zakupu oraz 77 przypadków zakupu,
     jednak 71 osób, które nie kupiły roweru, zostało błędnie
-    zaklasyfikowanych jako kupujący, a 54 osoby, które dokonały zakupu,
+    zaklasyfikowanych jako kupujący, a 50 osób, które dokonały zakupu,
     zostały zaklasyfikowane jako niekupujący.
 
-3.  Dokładność modelu Uzyskana dokładność modelu wynosi 58,33%, co
+3.  Dokładność modelu Uzyskana dokładność modelu wynosi 59,67%, co
     sugeruje umiarkowaną skuteczność klasyfikacji. Wynik ten może
     wskazywać na potrzebę optymalizacji modelu, np. poprzez pruning
     drzewa, zastosowanie innych metod klasyfikacyjnych lub inżynierię
