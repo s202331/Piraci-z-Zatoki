@@ -13,7 +13,7 @@ editor_options:
 ## Wstęp
 
 Klienci sklepu rowerowego wzięli udział w ankiecie, w której dostarczyli
-szczegółowe informacje na swój temat, takie jak: status cywilny, płeć,
+szczegółowych informacji na swój temat, takie jak: status cywilny, płeć,
 poziom dochodów, liczba dzieci, poziom wykształcenia, wykonywany zawód,
 status posiadania domu, liczba samochodów, odległość do miejsca pracy,
 region zamieszkania oraz wiek.
@@ -144,6 +144,31 @@ facet_wrap(~ name, scales = "free") +
 labs(title = "Rozkład zmiennych kategorycznych", x = "Kategorie", y = "Liczba obserwacji") +
 theme_minimal()  
 ```
+Rozkład zmiennych kategorycznych:
+- rozkład płci jest dość równomierny między kobietami a mężczyznami
+- większość respondentów jest właścicielami domów
+- większosć osób nie zakupiła roweru
+- najwięcej badanych pokonuje krótki dystans do pracy 0-1 mili
+------------------------------------------------------------------------
+
+## Analiza Rozkładu Zmiennych Liczbowych
+
+Na wykresach przedstawiono rozkład zmiennych liczbowych w zbiorze
+danych:
+
+-   **Age**: Zmienna Age wykazuje rozkład prawoskośny, z największą
+    liczbą obserwacji w przedziale 20-40 lat.
+-   **Cars**: Zmienna Cars przyjmuje wartości dyskretne, co wskazuje na
+    ograniczoną liczbę unikalnych kategorii.
+-   **Children**: Podobnie jak zmienna Cars, zmienna Children przyjmuje
+    wartości dyskretne, również wskazując na ograniczoną liczbę
+    unikalnych kategorii.
+-   **Income**: Zmienna Income ma szeroki zakres wartości, z dużą
+    koncentracją obserwacji w niższych przedziałach dochodów.Oznacza to,
+    że większość osób w badanej grupie ma niższe dochody, podczas gdy
+    mniejsza liczba osób zarabia znacznie więcej.
+
+------------------------------------------------------------------------
 
 ## Wizualizacje
 W tej sekcji przedstawiamy różne wykresy wizualizujące dane:
@@ -185,6 +210,24 @@ ggplot(sklep_rowerowy, aes(x = Region, y = Income, fill = Region)) +
 cor_matrix <- cor(sklep_rowerowy %>% select(where(is.numeric)), use = "complete.obs")
 ggcorrplot(cor_matrix, hc.order = TRUE, type = "lower", lab = TRUE)
 ```
+Największa liczba zakupów rowerów występuje w przypadku osób pokonujących krótkie dystanse (0-1 mili) do pracy, co sugeruje, że im krótszy dystans do pracy, tym większa skłonność do zakupu roweru. # czy umiecie zrobic tak żeby 10+ miles było na końcu wykresu, nie w środku, bo kategorie na osi poziomej rosna nie tak jak powinny, ja cos probowałam ale nie wyszło mi to przestawianie
+
+Z wykresu pudełkowego mozna odczytać, że klienci z regionu Pacyfiku mają
+najwyższe dochody, z medianą wyższą niż w pozostałych regionach, oraz
+dużą liczbą wartości odstających. W Ameryce Północnej dochody są nieco
+niższe, ale nadal wyższe niż w Europie, gdzie zaobserowano najniższą
+medianę dochodów i mniejsze zróżnicowanie wartości. Rozrzut dochodów
+jest największy w regionie Pacyfiku, co wskazuje na dużą różnorodność w
+poziomie zarobków klientów.
+
+Najwyższą korelację (0.53) obserwujemy między zmiennymi **Children** i
+**Income**, co sugeruje, że większa liczba dzieci może wiązać się z
+wyższymi dochodami. Ta zależność może wynikać z faktu, że rodziny z
+większą liczbą dzieci mogą potrzebować większych dochodów, aby zapewnić
+odpowiednie warunki życia. Natomiast zmienna **ID** nie wykazuje
+istotnej korelacji z żadną inną zmienną, co jest zgodne z oczekiwaniami,
+ponieważ pełni ona funkcję identyfikatora i nie ma bezpośredniego
+związku z innymi analizowanymi zmiennymi.
 
 ## Model drzewa decyzyjnego
 W tej sekcji budujemy model drzewa decyzyjnego do przewidywania zakupu roweru na podstawie dostępnych danych
@@ -231,7 +274,13 @@ accuracy <- mean(tree_predictions == test_data$`Purchased.Bike`)
 cat("Dokładność modelu drzewa decyzyjnego:", round(accuracy * 100, 2), "%\n")
 ```
 
-# Segmentacja klientów (Klasteryzacja K-średnich)
+Model drzewa decyzyjnego poprawnie przewidział **98 przypadków "No"** i
+**77 przypadków "Yes"**, ale popełnił **71 błędów fałszywie
+negatywnych** i **54 fałszywie pozytywne**. Jego dokładność wynosi
+**58,33%**, co oznacza, że klasyfikuje poprawnie nieco ponad połowę
+przypadków. Wynik wskazuje na umiarkowaną skuteczność, sugerując
+potrzebę dalszej optymalizacji modelu. \# Segmentacja klientów
+(Klasteryzacja K-średnich)
 
 ```{r}
 ### W tej sekcji przeprowadzamy segmentację klientów metodą klasteryzacji K-średnich. Klasteryzacja pozwala na grupowanie klientów o podobnych cechach, co może być użyteczne w strategiach marketingowych i personalizacji oferty.
@@ -265,6 +314,14 @@ kruskal_test_income_education <- kruskal.test(Income ~ Education, data = sklep_r
 print(kruskal_test_income_education)
 ```
 
+Test Kruskala-Wallisa został przeprowadzony w celu zbadania różnic w
+dochodach według poziomu wykształcenia. Wyniki testu wskazują na
+statystykę chi-kwadrat wynoszącą 119.15 przy 4 stopniach swobody, co
+sugeruje istotne różnice między grupami. P-value jest znacznie mniejsza
+niż poziom istotności α = 0.05, co pozwala na odrzucenie hipotezy
+zerowej. Istnieją statystycznie istotne różnice w medianach dochodów w
+zależności od poziomu wykształcenia.
+
 # Test jednorodności wariancji (Levene’a)
 
 ```{r}
@@ -275,27 +332,53 @@ leveneTest(Income ~ Region, data = sklep_rowerowy)
 leveneTest(Income ~ Education, data = sklep_rowerowy)
 ```
 
+Test Levene’a (sprawdzenie jednorodność wariancji)
+
+Test Levene’a wykazał istotne statystycznie różnice w wariancji dochodów
+między grupami wykształcenia, co potwierdzają wartości F = 15,435; p =
+2,503e-07 (dla 2 grup) oraz F = 2,5284; p = 0,03922 (dla 4 grup).
+Otrzymane wyniki wskazują na naruszenie założenia homogeniczności
+wariancji, co sugeruje, że rozkład dochodów nie jest jednorodny w
+analizowanych grupach.
+
 # Test Shapiro-Wilka dla każdej grupy poziomu wykształcenia
 
 ```{r}
 # Test ocenia normalność rozkładu dochodów w grupach edukacyjnych. Pomaga określić, czy stosować testy parametryczne czy nieparametryczne.
 by(sklep_rowerowy$Income, sklep_rowerowy$Education, shapiro.test)
 ```
+Dla wszystkich pięciu poziomów wykształcenia wyniki testu Shapiro-Wilka wskazują na brak normalności rozkładów dochodów, ponieważ w każdym przypadku wartość p jest mniejsza niż 0.05.
+Brak normalności danych w każdej z grup oznacza, że założenie o normalnym rozkładzie danych, wymagane w testach parametrycznych takich jak ANOVA, jest naruszone. W takim przypadku nie należy stosować testu ANOVA, ponieważ może to prowadzić do błędnych wniosków. Zamiast tego, do analizy użyto testu nieparametrycznego Kruskala-Wallisa, który nie wymaga założenia normalności rozkładu.
+# Test ANOVA dla dochodów w zależności od poziomu wykształcenia \_ usunęłam test ANOVA, bo nie mamy spełnionego założenia o noemalności, dlatego zrobiłam inny test, tym razem nieparametryczny kruskala-willisa
 
-# Test ANOVA dla dochodów w zależności od poziomu wykształcenia
+# Przeprowadzamy test Kruskal-Wallisa dla dochodów w zależności od poziomu wykształcenia
 
 ```{r}
-# Przeprowadzamy analizę wariancji (ANOVA) dla dochodów w zależności od poziomu wykształcenia.
-anova_income_education <- aov(Income ~ Education, data = sklep_rowerowy)
-summary(anova_income_education)
+# Przeprowadzenie testu Kruskal-Wallisa
+kruskal_income_education <- kruskal.test(Income ~ Education, data = sklep_rowerowy)
+
+# Wyświetlenie wyników testu
+print(kruskal_income_education)
+
 ```
 
+<<<<<<< HEAD
 # Powiązanie testów z analizą klientów
 ```{r}
 # - Test Kruskala-Wallisa**: Ocena różnic dochodów między grupami edukacyjnymi.
 # - Test Levene’a**: Sprawdzenie jednorodności wariancji, istotne dla segmentacji klientów.
 # - Test Shapiro-Wilka**: Weryfikacja założeń statystycznych dla dalszej analizy.
 ```
+=======
+Test Kruskala-Wallisa to nieparametryczny test statystyczny, który jest
+używany do porównania median w więcej niż dwóch grupach. Wartość
+chi-kwadrat wynosi 119,15, co wskazuje na istotną różnicę między grupami
+w analizowanej zmiennej - dochodach. Bardzo mała wartość p (\< 2.2e-16)
+sugeruje, że różnice między grupami są statystycznie istotne. Na
+podstawie tych wyników, hipoteza zerowa, mówiąca o braku różnic w
+medianach dochodów, zostaje odrzucona, co oznacza, że dochody różnią się
+w zależności od poziomu wykształcenia.
+>>>>>>> cf7b3fab27c317260d8d33353ceac2d8352bb17b
 
 # Statystyki opisowe dla zmiennych liczbowych
 
@@ -332,5 +415,11 @@ a
 
 # #
 #
+
+# Test kruskala widzę że mamy w 2 miejscch w anova i w test kruskala to bedzie trzeba wybrac gdzie go wstawić
+
+# 
+
+# 
 
 # 
