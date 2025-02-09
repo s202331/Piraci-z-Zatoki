@@ -25,11 +25,12 @@ W pierwszym etapie projektu przeprowadzono instalajcę oraz załadowanie
 pakietów niezbędnych do analizy danych.
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-
+options(repos = c(CRAN = "https://cloud.r-project.org/"))
 install.packages(c("readr", "naniar", "dplyr","summarytools", "tidyr","car","psych", 
                    "ggplot2", "mice", "rpart","ggcorrplot","rpart.plot", "gridExtra", 
                    "factoextra", "plyr"))
+install.packages("ggstatsplot")  
+library(ggstatsplot)
 library(readr)
 library(naniar)
 library(plyr)
@@ -49,8 +50,8 @@ library(summarytools)
 library(readr)
 
 ```
-## Importowanie danych
-```{r}
+
+```{r include=FALSE}
 read.csv("sklep_rowerowy.csv")
 sklep_rowerowy <- read.csv("sklep_rowerowy.csv")
 ```
@@ -127,8 +128,6 @@ mutate(across(where(is.numeric), ~ ifelse(is.na(.), mean(., na.rm = TRUE, trim =
 
 imputed_data <- mice(sklep_rowerowy, m = 5, method = 'pmm', seed = 123)
 sklep_rowerowy <- complete(imputed_data)
-
-sklep_rowerowy
 
 n_miss(sklep_rowerowy)
 
@@ -418,28 +417,33 @@ library(summarytools)
 dfSummary(sklep_rowerowy) %>% print(method = "render", style = "grid")
 ```
 
-## Wizualizacja testóww 
+## Wizualizacja danych 
 ```{r}
-install.packages("ggstatsplot")  
-library(ggstatsplot)
+# Filtrujemy dane tylko dla klientów, którzy kupili rower
+sklep_rowerowy_yes <- sklep_rowerowy %>% filter(Purchased.Bike == "Yes")
 
-ggbetweenstats( data = sklep_rowerowy, x = Purchased.Bike, y = Region,
-type = "nonparametric",
-title = "Wiek a decyzja o zakupie roweru",
-xlab = "Zakup roweru", ylab = "Wiek", )
+# Wizualizacja wieku dla klientów, którzy kupili rower
+ggbetweenstats(
+  data = sklep_rowerowy_yes,
+  x = Purchased.Bike,
+  y = Age,
+  type = "nonparametric",
+  title = "Wiek klientów, którzy kupili rower",
+  xlab = "Zakup roweru (Yes)",
+  ylab = "Wiek"
+)
 
-
-ggbetweenstats( data = sklep_rowerowy, x = Purchased.Bike,
-y = Income,
-type = "nonparametric",
-title = "Dochód a = zakup roweru", xlab = "Zakup roweru", ylab = "Dochód", )
-
-ggbetweenstats( data = sklep_rowerowy, x = Purchased.Bike,
-y = Commute.Distance,
-type = "nonparametric",
-title = "Odległość od pracy a  zakup roweru", xlab = "Zakup roweru", ylab = "Odległość od pracy", )
+# Wizualizacja dochodu dla klientów, którzy kupili rower
+ggbetweenstats(
+  data = sklep_rowerowy_yes,
+  x = Purchased.Bike,
+  y = Income,
+  type = "nonparametric",
+  title = "Dochód klientów, którzy kupili rower",
+  xlab = "Zakup roweru (Yes)",
+  ylab = "Dochód"
+)
 ```
-
 
 ## Podsumowanie
 
@@ -461,11 +465,6 @@ Podsumowując, wyniki analizy wskazują na dużą koncentrację klientów w
 określonych grupach wiekowych oraz o dużej zależności miedzy odległością
 do pracy a zakupem roweru. Przeprowadzone analizy pozwalają na lepsze
 zrozumienie potrzeb klientów, co może przyczynić się do poprawy
-efektywności działań marketingowych i sprzedażowych sklepu rowerowego.
+efektywności działań marketingowych i sprzedażowych sklepu rowerowego. 
 
-```{r}
-install.packages(c("rmarkdown", "knitr"))
-library(rmarkdown)
-library(knitr)
-rmarkdown::render("Rmarkdown projekt.Rmd", output_format = "html_document")
-```
+
